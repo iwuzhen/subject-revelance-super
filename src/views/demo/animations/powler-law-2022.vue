@@ -29,7 +29,7 @@ el-container
 </template>
 
 <script setup lang="ts">
-import { pageStore } from "./pinia/modules/pageStore";
+import { pageStore } from "@/pinia/modules/pageStore";
 import _ from "lodash";
 import { reactive, onMounted, ref } from "vue";
 import axios from "axios";

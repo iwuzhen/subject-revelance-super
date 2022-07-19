@@ -25,4 +25,4 @@ jobs:
     - name: Build
       run: |
         yarn
-        yarb build
+        yarn build
