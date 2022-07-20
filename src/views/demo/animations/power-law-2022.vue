@@ -1,7 +1,5 @@
 <template lang="pug">
 el-container
-  el-header
-    h1 幂律度分布逐年动画 
   el-main
     el-row
       el-col(:span="24") 学科选择
@@ -25,11 +23,10 @@ el-container
     el-row
       el-col(:span="24" v-loading="loading")
         #echart
-  el-foot foot
 </template>
 
 <script setup lang="ts">
-import { pageStore } from "@/pinia/modules/pageStore";
+import { powerlawDemoStore, homeStore } from "@/pinia/modules/pageStore";
 import _ from "lodash";
 import { reactive, onMounted, ref } from "vue";
 import axios from "axios";
@@ -112,7 +109,9 @@ const option = {
   },
 };
 
-const appPageStore = pageStore();
+const appPageStore = powerlawDemoStore();
+const appHomeStore = homeStore();
+appHomeStore.title = "幂律度分布逐年动画";
 
 interface basicInterface {
   [propName: string]: number;
@@ -252,19 +251,11 @@ onMounted(() => {
 </script>
 
 <style lang="less">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-  .el-col {
-    margin: 20px 10px;
-  }
-  #echart {
-    width: 100vw;
-    height: 600px;
-  }
+.el-col {
+  margin: 20px 10px;
+}
+#echart {
+  width: 100vw;
+  height: 600px;
 }
 </style>

@@ -1,16 +1,22 @@
 <template lang="pug">
 el-container
-  el-header
-    h1 {{appHomeStore.title}}
-    //- i.fa-brands.fa-wikipedia-w
   el-main
-    router-view
-  el-footer footer
+    el-row
+      el-col(:span="24")
+        el-button I am ElButton
+    el-row
+      el-col(:span="4")
+        router-link(to='/') Home
+      el-col(:span="4")
+        router-link(to='/demo/animation/power-law-2022') power-law-2022
+      el-col(:span="4")
+        router-link(to='/demo/browser/mag-fos-2022') mag-fos-2022
 </template>
 
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
 const appHomeStore = homeStore();
+appHomeStore.title = "Home";
 </script>
 
 <style lang="less">

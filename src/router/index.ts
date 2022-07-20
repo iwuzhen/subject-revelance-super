@@ -1,16 +1,21 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import HomeView from "@/App.vue";
+import HomeView from "@/views/HomeView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "home",
+    name: "Homw",
     component: HomeView,
   },
   {
-    path: "/demo/animation/powler-law-2022",
-    name: "powler-law-2022",
-    component: () => import("@/views/demo/animations/powler-law-2022.vue"),
+    path: "/demo/animation/power-law-2022",
+    name: "power-law-2022",
+    component: () => import("@/views/demo/animations/power-law-2022.vue"),
+  },
+  {
+    path: "/demo/browser/mag-fos-2022",
+    name: "mag-fos-2022",
+    component: () => import("@/views/demo/browser/mag-fos-2022.vue"),
   },
 ];
 

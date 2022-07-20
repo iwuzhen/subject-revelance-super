@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
-export const pageStore = defineStore("pageStore", {
+export const powerlawDemoStore = defineStore("powerlawDemo", {
   state() {
     return {
       subjectSelect: ["Biology", "Chemistry", "Physics"],
@@ -18,6 +18,23 @@ export const pageStore = defineStore("pageStore", {
     strategies: [
       {
         key: "page",
+        storage: localStorage,
+      },
+    ],
+  },
+});
+
+export const homeStore = defineStore("home", {
+  state() {
+    return {
+      title: "",
+    };
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: "home",
         storage: localStorage,
       },
     ],

@@ -56,7 +56,7 @@ module.exports = defineConfig({
       // }
       args[0].cdn = cdn;
       return args;
-    });
+    })
     //视为一个外部库，而不将它打包进来
     config.externals(externals);
   },
