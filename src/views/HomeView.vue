@@ -2,9 +2,6 @@
 el-container
   el-main
     el-row
-      el-col(:span="24")
-        el-button I am ElButton
-    el-row
       el-col(:span="4")
         router-link(to='/') Home
       el-col(:span="4")
