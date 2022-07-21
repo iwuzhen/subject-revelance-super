@@ -1,19 +1,37 @@
 <template lang="pug">
 el-container
   el-main
-    el-row
-      el-col(:span="4")
-        router-link(to='/') Home
-      el-col(:span="4")
-        router-link(to='/demo/animation/power-law-2022') power-law-2022
-      el-col(:span="4")
-        router-link(to='/demo/browser/mag-fos-2022') mag-fos-2022
+    el-space(wrap)
+      router-link(v-for="item in pageData" :to="item.href" target="_blank")
+        el-card
+          template(#header)
+            .card-header
+              span {{item.title}}
+          span {{item.text}}
+          .bottom 
+            time {{dayjs(item.update).locale('zh-cn').format('YYYY-MM-DD')}}
 </template>
 
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
 const appHomeStore = homeStore();
-appHomeStore.title = "Home";
+appHomeStore.title = "wiki";
+import dayjs from "dayjs";
+
+const pageData = [
+  {
+    title: "power-law-2022",
+    text: "幂律动画图",
+    update: "2022-07-21T09:43:03.429Z",
+    href: "/demo/animation/power-law-2022",
+  },
+  {
+    title: "mag-fos-2022",
+    text: "fos 层级搜索引擎",
+    update: "2022-07-21T09:43:03.429Z",
+    href: "/demo/browser/mag-fos-2022",
+  },
+];
 </script>
 
 <style lang="less">
@@ -23,5 +41,17 @@ appHomeStore.title = "Home";
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  .time {
+    font-size: 12px;
+    color: #999;
+  }
+
+  .bottom {
+    margin-top: 13px;
+    line-height: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }
 </style>

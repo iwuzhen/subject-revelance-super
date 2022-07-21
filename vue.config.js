@@ -19,6 +19,9 @@ const cdn = {
     "https://cdn.staticfile.org/lodash.js/4.17.21/lodash.min.js",
     "https://cdn.staticfile.org/echarts/5.3.3/echarts.min.js",
     // "https://cdn.staticfile.org/pinia/2.0.16/pinia.iife.min.js",
+    "https://cdn.staticfile.org/dayjs/1.11.4/dayjs.min.js",
+    "https://cdn.staticfile.org/dayjs/1.11.4/locale/zh-cn.min.js",
+    "https://cdn.staticfile.org/dayjs/1.11.4/plugin/relativeTime.min.js",
   ],
 };
 
@@ -40,7 +43,7 @@ const externals = {
   // localforage: 'localforage',
   // d3: 'd3',
   // lodash: '_',
-  // dayjs: 'dayjs',
+  dayjs: "dayjs",
   // THREE: 'three',
 };
 
