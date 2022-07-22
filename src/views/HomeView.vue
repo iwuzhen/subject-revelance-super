@@ -21,14 +21,20 @@ import dayjs from "dayjs";
 
 const pageData = [
   {
+    title: "NFS-stats-2022-07",
+    text: "NFS 数据统计",
+    update: "2022-07-22T09:43:03.429Z",
+    href: "/demo/nfs/nfs-stats-2022-07",
+  },
+  {
     title: "power-law-2022",
-    text: "幂律动画图",
+    text: "wikipedia 幂律动画图",
     update: "2022-07-21T09:43:03.429Z",
     href: "/demo/animation/power-law-2022",
   },
   {
-    title: "mag-fos-2022",
-    text: "fos 层级搜索引擎",
+    title: "MAG-FOS-2022",
+    text: "FOS 层级搜索引擎",
     update: "2022-07-21T09:43:03.429Z",
     href: "/demo/browser/mag-fos-2022",
   },

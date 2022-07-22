@@ -6295,6 +6295,11 @@ tr46@~0.0.3:
   resolved "https://registry.npmmirror.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
 
+ts-deepmerge@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.npmmirror.com/ts-deepmerge/-/ts-deepmerge-2.0.4.tgz#294d08c0b6957cb15f3eac2dfa020611e0db8cf1"
+  integrity sha512-+xUYN/yYCwAtK7NtE0M1w5U1TlJg8ODoepMttmfsuRSo/Pz49bv7ZCILkCiBEpGBOIRrFMynnIhrY42U57Rl1g==
+
 ts-loader@^9.2.5:
   version "9.3.1"
   resolved "https://registry.npmmirror.com/ts-loader/-/ts-loader-9.3.1.tgz#fe25cca56e3e71c1087fe48dc67f4df8c59b22d4"

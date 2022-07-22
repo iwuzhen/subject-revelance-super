@@ -16,6 +16,7 @@
     "lodash": "^4.17.21",
     "pinia": "^2.0.14",
     "pinia-plugin-persist": "^1.0.0",
+    "ts-deepmerge": "^2.0.4",
     "vue": "^3.2.13",
     "vue-router": "^4.1.2"
   },

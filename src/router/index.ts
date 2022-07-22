@@ -17,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "mag-fos-2022",
     component: () => import("@/views/demo/browser/mag-fos-2022.vue"),
   },
+  {
+    path: "/demo/nfs/nfs-stats-2022-07",
+    name: "nfs-stats-2022-07",
+    component: () => import("@/views/demo/nfs/nfs-stats-2022-07.vue"),
+  },
 ];
 
 const router = createRouter({
