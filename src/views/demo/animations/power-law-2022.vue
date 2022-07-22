@@ -162,11 +162,11 @@ const updateChart = _.debounce(async () => {
       cats: appPageStore.subjectSelect.join(","),
       islog: 1,
       level: appPageStore.levelSelect,
-      month: appPageStore.monthSelect,
+      month: 3,
       type: appPageStore.zipfTypeSelect,
       x_from: appPageStore.nodeRange[0],
       x_to: appPageStore.nodeRange[1],
-      y_to: appPageStore.yTo,
+      y_to: 0.1,
       year: 2007,
     },
   };
