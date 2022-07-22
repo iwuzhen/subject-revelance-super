@@ -4,7 +4,7 @@ import { ref, reactive } from "vue";
 export const powerlawDemoStore = defineStore("powerlawDemo", {
   state() {
     return {
-      subjectSelect: reactive(["Biology", "Chemistry", "Physics"]),
+      subjectSelect: reactive(["Biology"]),
       zipfTypeSelect: "zipf",
       levelSelect: 2,
       nodeRange: ref([1, 1000]),
