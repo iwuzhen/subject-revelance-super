@@ -224,7 +224,7 @@ const updateChart = _.debounce(async () => {
         show: true,
       },
       yAxis: {
-        max: 4,
+        max: 5,
       },
       timeline: {
         axisType: "category",
