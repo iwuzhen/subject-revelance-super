@@ -1,7 +1,7 @@
 <template lang="pug">
 el-container
   el-header
-    h1 {{appHomeStore.title}}
+    h1.text-2xl {{appHomeStore.title}}
     //- i.fa-brands.fa-wikipedia-w
   el-main
     router-view

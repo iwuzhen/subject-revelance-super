@@ -1,16 +1,14 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 
 export const powerlawDemoStore = defineStore("powerlawDemo", {
   state() {
     return {
-      subjectSelect: ["Biology", "Chemistry", "Physics"],
+      subjectSelect: reactive(["Biology", "Chemistry", "Physics"]),
       zipfTypeSelect: "zipf",
-      monthSelect: 3,
       levelSelect: 2,
-      nodeRange: ref([1, 10000]),
-      yTo: 0.1,
-      autoPlay: false,
+      nodeRange: ref([1, 1000]),
+      autoPlay: ref(false),
     };
   },
   persist: {

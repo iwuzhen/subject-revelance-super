@@ -7,16 +7,10 @@ el-container
           el-option(v-for="item in option.subject.opt",:key="item",:label="item",:value="item")
     el-row 
       el-col(:span="11") 求斜率范围: {{appPageStore.nodeRange[0]}} ~ {{appPageStore.nodeRange[1]}}
-        el-slider(v-model="appPageStore.nodeRange", range,:max="40000",:min="10",@change='updateChart')
-      el-col(:span="11") 度阈值: {{appPageStore.yTo}}
-        el-slider(v-model="appPageStore.yTo", :step="0.01", :max="1",:min="0",@change='updateChart')
-    el-row 
+        el-slider(v-model="appPageStore.nodeRange", range,:max="10000",:min="10",@change='updateChart')
       el-col(:span="3") 幂律范围
         el-select(v-model="appPageStore.zipfTypeSelect", placeholder="幂律范围",size='large',@change='updateChart')
           el-option(v-for="item in option.type.opt",:key="item.value",:label="item.text",:value="item.value")
-      el-col(:span="3") month
-        el-select(v-model="appPageStore.monthSelect", placeholder="month",size='large',@change='updateChart')
-          el-option(v-for="item in option.month.opt",:key="item",:label="item",:value="item")
       el-col(:span="3") level
         el-select(v-model="appPageStore.levelSelect", placeholder="level",size='large',@change='updateChart')
           el-option(v-for="item in [2,3]",:key="item",:label="item",:value="item")
@@ -177,20 +171,25 @@ const updateChart = _.debounce(async () => {
     },
   };
   let seriesListArray = [];
-  let yearStrik = [];
+  let yearStrik: string[] = [];
   loading.value = true;
   for (let i = 0; i < 15; i++) {
-    try {
-      // console.log(axiosOption);
-      axiosOption.data.year = 2007 + i;
-      let response = await axios.request<responseInterface>(axiosOption);
-      console.log(response.data);
-      // 需要清理压缩提取数据,保留2位小数
-      let seriesList = reFindData(response.data);
-      seriesListArray.push(seriesList);
-      yearStrik.push(axiosOption.data.year);
-    } catch (error) {
-      console.log(axiosOption.data.year, "requests error");
+    for (let month of [3, 6, 9, 12]) {
+      try {
+        // console.log(axiosOption);
+        axiosOption.data.year = 2007 + i;
+        axiosOption.data.month = month;
+        let response = await axios.request<responseInterface>(axiosOption);
+        console.log(response.data);
+        // 需要清理压缩提取数据,保留2位小数
+        let seriesList = reFindData(response.data);
+        seriesListArray.push(seriesList);
+        yearStrik.push(
+          `${axiosOption.data.year}.${("0" + axiosOption.data.month).slice(-2)}`
+        );
+      } catch (error) {
+        console.log(axiosOption.data.year, "requests error");
+      }
     }
   }
 
