@@ -6,10 +6,11 @@ el-container
         el-card
           template(#header)
             .card-header
-              span {{item.title}}
-          span {{item.text}}
-          .bottom 
-            time {{dayjs(item.update).locale('zh-cn').format('YYYY-MM-DD')}}
+              span.text-2xl {{item.title}}
+          .description 
+            p {{item.text}}
+          .bottom
+            time.italic {{dayjs(item.update).locale('zh-cn').format('YYYY-MM-DD')}}
 </template>
 
 <script setup lang="ts">
@@ -45,13 +46,16 @@ const pageData = [
     font-size: 12px;
     color: #999;
   }
-
+  .description {
+    font-size: 20px;
+    align-items: left;
+  }
   .bottom {
     margin-top: 13px;
     line-height: 12px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
   }
 }
 </style>
