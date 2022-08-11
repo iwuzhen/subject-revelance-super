@@ -18,6 +18,15 @@ el-row
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
 </template>
 
+<script lang="ts">
+export default {
+  name: "MAG-fos-2022",
+  autoIndex: true,
+  text: "FOS 层级搜索引擎",
+  update: "2022-07-21T09:43:03.429Z",
+};
+</script>
+
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
 import axios from "axios";

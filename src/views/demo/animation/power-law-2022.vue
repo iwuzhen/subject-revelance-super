@@ -19,6 +19,15 @@ el-container
         #echart
 </template>
 
+<script lang="ts">
+export default {
+  name: "power-law-2022",
+  autoIndex: true,
+  text: "wikipedia 幂律动画图",
+  update: "2022-07-21T09:43:03.429Z",
+};
+</script>
+
 <script setup lang="ts">
 import { powerlawDemoStore, homeStore } from "@/pinia/modules/pageStore";
 import _ from "lodash";

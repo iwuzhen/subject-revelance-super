@@ -26,6 +26,15 @@ el-container
     //-       el-option(v-for="item in [2,3]",:key="item",:label="item",:value="item")
 </template>
 
+<script lang="ts">
+export default {
+  name: "NFS-stats-2022-07",
+  autoIndex: true,
+  text: "NFS 数据统计",
+  update: "2022-07-21T09:43:03.429Z",
+};
+</script>
+
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
 import _ from "lodash";

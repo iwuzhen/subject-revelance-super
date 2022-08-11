@@ -19,26 +19,30 @@ const appHomeStore = homeStore();
 appHomeStore.title = "wiki";
 import dayjs from "dayjs";
 
-const pageData = [
+let pageData = [
   {
     title: "NFS-stats-2022-07",
     text: "NFS 数据统计",
     update: "2022-07-22T09:43:03.429Z",
     href: "/demo/nfs/nfs-stats-2022-07",
   },
-  {
-    title: "power-law-2022",
-    text: "wikipedia 幂律动画图",
-    update: "2022-07-21T09:43:03.429Z",
-    href: "/demo/animation/power-law-2022",
-  },
-  {
-    title: "MAG-FOS-2022",
-    text: "FOS 层级搜索引擎",
-    update: "2022-07-21T09:43:03.429Z",
-    href: "/demo/browser/mag-fos-2022",
-  },
 ];
+pageData = [];
+
+const files = require.context("@/views", true, /\.vue$/);
+files.keys().map((item) => {
+  const path = item.slice(1).replace(".vue", "").toLowerCase();
+  // 获取组件信息
+  const comp = files(item).default;
+  if (comp.autoIndex === true) {
+    pageData.push({
+      title: comp.name,
+      text: comp.text,
+      update: comp.update,
+      href: path,
+    });
+  }
+});
 </script>
 
 <style lang="less">
