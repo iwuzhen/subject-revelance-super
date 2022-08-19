@@ -2288,7 +2288,7 @@ const updateChart = _.debounce(async () => {
       },
       {
         type: "line",
-        name: "GPD统一资金数",
+        name: "资金数 CPI 加权",
         yAxisIndex: 1,
         encode: {
           x: "year",
