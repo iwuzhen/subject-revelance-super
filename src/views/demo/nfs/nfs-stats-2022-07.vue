@@ -2,12 +2,24 @@
 el-container
   el-main
     el-row
+      el-col(:span="6")
+        el-form-item(label="GDP 缩小倍数:" size="large")
+          el-input-number(v-model="appNsfStatstore.GDPZoom",:min=100,:max=10000 ,:step=100, size="large", @change='updateChart')
+      el-col(:span="4")
+        el-form-item(label="GDP CPI加权:" size="large")
+          el-checkbox(v-model="appNsfStatstore.GDPvCPI",size="large",  @change='updateChart')
+      el-col(:span="4")
+        el-form-item(label="资金 CPI加权:" size="large")
+          el-checkbox(v-model="appNsfStatstore.FundMvCPI",size="large",  @change='updateChart')
+          
+    el-row
       el-col(:span="24")
         #echart1.echart
     el-row
-      el-col(:span="8") 数据类型
-        el-select(v-model="chart1Type.select", placeholder="图表选择",style="width: 100%",size='large',@change='updateNextChart')
-          el-option(v-for="item in chart1Type.opt",:key="item.value",:label="item.text",:value="item.value")
+      el-col(:span="8")
+        el-form-item(label="数据类型:" size="large")
+          el-select(v-model="chart1Type.select",placeholder="图表选择",style="width: 100%",size='large',@change='updateNextChart')
+            el-option(v-for="item in chart1Type.opt",:key="item.value",:label="item.text",:value="item.value")
     el-row
       el-col(:span="24")
         #echart2.echart
@@ -23,14 +35,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { homeStore } from "@/pinia/modules/pageStore";
-import _, { round } from "lodash";
+import { homeStore, nsfStatstore } from "@/pinia/modules/pageStore";
+import _ from "lodash";
 import { reactive, onMounted, ref } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 
 const appHomeStore = homeStore();
 appHomeStore.title = "NFS 数据统计";
+
+const appNsfStatstore = nsfStatstore();
 
 const addNewColume = (source: any, newName: string, callback: any) => {
   // first row is schema
@@ -113,12 +127,6 @@ let dataSet = [
   [2020, 12804, 5806.112265, 118.6905016, 20893744],
   [2021, 12300, 5423.631686, 124.2664138, 22996100],
 ];
-
-// 生成一些数据
-// ["year", "Fund", "NumborOfProject", "CPI", "GDP", "UfundM"],
-addNewColume(dataSet, "UfundM", (obj: any) => {
-  return round((obj.fundM / obj.CPI) * 100, 1);
-});
 
 // NSF Directorate  资金分布
 let dataSet1 = [
@@ -2235,6 +2243,24 @@ const chart1Type = reactive({
 let myChart1: echarts.ECharts, myChart2: echarts.ECharts;
 
 const updateChart = _.debounce(async () => {
+  // 生成一些数据
+  // ["year", "Fund", "NumborOfProject", "CPI", "GDP", "UfundM"],
+  const dataSetObj = _.cloneDeep(dataSet);
+  addNewColume(dataSetObj, "UfundM", (obj: any) => {
+    return _.round((obj.fundM / obj.CPI) * 100, 1);
+  });
+  addNewColume(dataSetObj, "GDPZoom", (obj: any) => {
+    if (appNsfStatstore.GDPvCPI) {
+      return _.round((obj.GDPM / appNsfStatstore.GDPZoom / obj.CPI) * 100, 1);
+    }
+    return _.round(obj.GDPM / appNsfStatstore.GDPZoom, 1);
+  });
+
+  addNewColume(dataSetObj, "FundVSGDP", (obj: any) => {
+    return obj.fundM / obj.GDPM;
+  });
+
+  console.log(dataSetObj);
   let option = extendEchartsOpts({
     title: {
       left: "center",
@@ -2261,9 +2287,14 @@ const updateChart = _.debounce(async () => {
         name: "百万美元",
         position: "right",
       },
+      {
+        name: "Fund/GDP",
+        position: "right",
+        show: false,
+      },
     ],
     dataset: {
-      source: dataSet,
+      source: dataSetObj,
     },
     tooltip: {
       formatter: function (params: any) {
@@ -2282,8 +2313,11 @@ const updateChart = _.debounce(async () => {
             continue;
           }
           const _text = params[i].seriesName;
-          const _data = params[i].data[dataID];
+          let _data = params[i].data[dataID];
           const _marker = params[i].marker;
+          if (_text.includes("占比")) {
+            _data = _.round(_data * 100, 4) + "%";
+          }
           showHtm += `${_marker}${_text}：${_data}<br>`;
         }
         return showHtm;
@@ -2301,33 +2335,37 @@ const updateChart = _.debounce(async () => {
       },
       {
         type: "line",
-        name: "资金数",
+        name: appNsfStatstore.FundMvCPI ? "资金数 CPI 加权" : "资金数",
         yAxisIndex: 1,
         encode: {
           x: "year",
-          y: "fundM",
+          y: appNsfStatstore.FundMvCPI ? "UfundM" : "fundM",
         },
       },
       {
         type: "line",
-        name: "资金数 CPI 加权",
+        name: appNsfStatstore.GDPvCPI
+          ? `GDP 加权CPI  缩小${appNsfStatstore.GDPZoom}倍`
+          : `GDP 缩小${appNsfStatstore.GDPZoom}倍`,
         yAxisIndex: 1,
         encode: {
           x: "year",
-          y: "UfundM",
+          y: "GDPZoom",
         },
       },
       {
         type: "line",
-        name: "GDP",
-        yAxisIndex: 1,
+        name: "资金在 GDP 中占比",
+        yAxisIndex: 2,
         encode: {
           x: "year",
-          y: "GDPM",
+          y: "FundVSGDP",
         },
       },
     ],
   });
+  console.log("set opion:", option);
+  myChart1.clear();
   myChart1.setOption(option);
 }, 1000);
 
@@ -2387,7 +2425,7 @@ const updateNextChart = _.debounce(async () => {
     }),
   });
   console.log(option);
-  myChart2.clear();
+  // myChart2.clear();
   myChart2.setOption(option);
 }, 1000);
 

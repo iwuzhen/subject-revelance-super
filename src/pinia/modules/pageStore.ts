@@ -22,6 +22,44 @@ export const powerlawDemoStore = defineStore("powerlawDemo", {
   },
 });
 
+export const nsfStatstore = defineStore("nsfStatsDemo", {
+  state() {
+    return {
+      GDPvCPI: ref(false),
+      FundMvCPI: ref(false),
+      GDPZoom: ref(3000),
+    };
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: "page",
+        storage: localStorage,
+      },
+    ],
+  },
+});
+
+export const nsfcStatstore = defineStore("nsfcStatsDemo", {
+  state() {
+    return {
+      GDPvCPI: ref(false),
+      FundMvCPI: ref(false),
+      GDPZoom: ref(800),
+    };
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: "page",
+        storage: localStorage,
+      },
+    ],
+  },
+});
+
 export const homeStore = defineStore("home", {
   state() {
     return {
