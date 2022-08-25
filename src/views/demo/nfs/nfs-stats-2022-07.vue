@@ -2,32 +2,32 @@
 el-container
   el-main
     el-row
-      el-col(span="8")
+      el-col(:span="8")
         el-form.radius(label-position="left" label-width="auto")
-          el-form-item(label="展示GDP:" size="large")
+          el-form-item(label="GDP:" size="large")
             el-checkbox(v-model="appNsfStatstore.ShowGDP", size="large",  @change='updateChart')
 
           el-form-item(label="选项:" size="large")
-            el-checkbox(v-model="appNsfStatstore.GDPvCPI",size="large",label="GDP CPI加权",:disabled="!appNsfStatstore.ShowGDP",  @change='updateChart')
+            el-checkbox(v-model="appNsfStatstore.GDPvCPI",size="large",label="CPI加权",:disabled="!appNsfStatstore.ShowGDP",  @change='updateChart')
 
           el-form-item(label="GDP 缩小倍数:" size="large")
             el-input-number(v-model="appNsfStatstore.GDPZoom",:min=100,:max=10000 ,:step=100, size="default",:disabled="!appNsfStatstore.ShowGDP", @change='updateChart')
 
-      el-col(:span="4")
+      el-col(:span="6")
         el-form.radius(label-position="left" label-width="auto")
-          el-form-item(label="展示资金数:" size="large")
+          el-form-item(label="资金数:" size="large")
             el-checkbox(v-model="appNsfStatstore.ShowFund", size="large",  @change='updateChart')
           el-form-item(label="选项:" size="large")
-            el-checkbox(v-model="appNsfStatstore.FundMvCPI",size="large",label="资金 CPI加权",:disabled="!appNsfStatstore.ShowFund",  @change='updateChart')
+            el-checkbox(v-model="appNsfStatstore.FundMvCPI",size="large",label="CPI加权",:disabled="!appNsfStatstore.ShowFund",  @change='updateChart')
 
       el-col(:span="4")
-        el-form.radius(label-position="left" label-width="auto")
-          el-form-item(label="展示项目数:" size="large")
+        el-form.radius(label-position="left")
+          el-form-item(label="项目数:" size="large")
             el-checkbox(v-model="appNsfStatstore.ShowNOI", size="large",  @change='updateChart')
 
       el-col(:span="4")
-        el-form.radius(label-position="left" label-width="auto")
-          el-form-item(label="展示资金GDP比例:" size="large")
+        el-form.radius(label-position="left")
+          el-form-item(label="资金GDP比例:" size="large")
             el-checkbox(v-model="appNsfStatstore.ShowRatio", size="large",  @change='updateChart')
           
     el-row
@@ -2258,7 +2258,7 @@ const chart1Type = reactive({
   ],
 });
 
-let myChart1: echarts.ECharts, myChart2: echarts.ECharts;
+let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
   // 生成一些数据
@@ -2394,8 +2394,8 @@ const updateChart = _.debounce(async () => {
   });
 
   console.log("set opion:", option);
-  myChart1.clear();
-  myChart1.setOption(option);
+  myChartObjs[0].clear();
+  myChartObjs[0].setOption(option);
 }, 1000);
 
 const updateNextChart = _.debounce(async () => {
@@ -2455,20 +2455,25 @@ const updateNextChart = _.debounce(async () => {
   });
   console.log(option);
   // myChart2.clear();
-  myChart2.setOption(option);
+  myChartObjs[1].setOption(option);
 }, 1000);
 
 onMounted(() => {
   let elem = document.getElementById("echart1");
   if (elem) {
-    myChart1 = echarts.init(elem);
+    myChartObjs.push(echarts.init(elem));
   }
   elem = document.getElementById("echart2");
   if (elem) {
-    myChart2 = echarts.init(elem);
+    myChartObjs.push(echarts.init(elem));
   }
   updateChart();
   updateNextChart();
+  window.onresize = _.debounce(() => {
+    myChartObjs.forEach((element) => {
+      element.resize();
+    });
+  }, 500);
 });
 </script>
 
