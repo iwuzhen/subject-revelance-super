@@ -2,16 +2,33 @@
 el-container
   el-main
     el-row
+      el-col(:span="8")
+        el-form.radius(label-position="left" label-width="auto")
+          el-form-item(label="GDP:" size="large")
+            el-checkbox(v-model="appStore.ShowGDP", size="large",  @change='updateChart')
+
+          el-form-item(label="选项:" size="large")
+            el-checkbox(v-model="appStore.GDPvCPI",size="large",label="CPI加权",:disabled="!appStore.ShowGDP",  @change='updateChart')
+
+          el-form-item(label="GDP 缩小倍数:" size="large")
+            el-input-number(v-model="appStore.GDPZoom",:min=100,:max=10000 ,:step=100, size="default",:disabled="!appStore.ShowGDP", @change='updateChart')
+
       el-col(:span="6")
-        el-form-item(label="GDP 缩小倍数:" size="large")
-          el-input-number(v-model="appNsfcStatstore.GDPZoom",:min=100,:max=10000 ,:step=100, size="large", @change='updateChart')
+        el-form.radius(label-position="left" label-width="auto")
+          el-form-item(label="资金数:" size="large")
+            el-checkbox(v-model="appStore.ShowFund", size="large",  @change='updateChart')
+          el-form-item(label="选项:" size="large")
+            el-checkbox(v-model="appStore.FundMvCPI",size="large",label="CPI加权",:disabled="!appStore.ShowFund",  @change='updateChart')
+
       el-col(:span="4")
-        el-form-item(label="GDP CPI加权:" size="large")
-          el-checkbox(v-model="appNsfcStatstore.GDPvCPI",size="large",  @change='updateChart')
+        el-form.radius(label-position="left")
+          el-form-item(label="项目数:" size="large")
+            el-checkbox(v-model="appStore.ShowNOI", size="large",  @change='updateChart')
+
       el-col(:span="4")
-        el-form-item(label="资金 CPI加权:" size="large")
-          el-checkbox(v-model="appNsfcStatstore.FundMvCPI",size="large",  @change='updateChart')
-          
+        el-form.radius(label-position="left")
+          el-form-item(label="资金GDP比例:" size="large")
+            el-checkbox(v-model="appStore.ShowRatio", size="large",  @change='updateChart')      
     el-row
       el-col(:span="24")
         #echart1.echart
@@ -23,19 +40,6 @@ el-container
     el-row
       el-col(:span="24")
         #echart2.echart
-    //- el-row
-    //-   el-col(:span="24") 学科选择
-    //-     el-select(v-model="appPageStore.subjectSelect",multiple, placeholder="学科选择",clearable,style="width: 100%",size='large',@change='updateChart')
-    //-       el-option(v-for="item in option.subject.opt",:key="item",:label="item",:value="item")
-    //- el-row 
-    //-   el-col(:span="11") 求斜率范围: {{appPageStore.nodeRange[0]}} ~ {{appPageStore.nodeRange[1]}}
-    //-     el-slider(v-model="appPageStore.nodeRange", range,:max="10000",:min="10",@change='updateChart')
-    //-   el-col(:span="3") 幂律范围
-    //-     el-select(v-model="appPageStore.zipfTypeSelect", placeholder="幂律范围",size='large',@change='updateChart')
-    //-       el-option(v-for="item in option.type.opt",:key="item.value",:label="item.text",:value="item.value")
-    //-   el-col(:span="3") level
-    //-     el-select(v-model="appPageStore.levelSelect", placeholder="level",size='large',@change='updateChart')
-    //-       el-option(v-for="item in [2,3]",:key="item",:label="item",:value="item")
 </template>
 
 <script lang="ts">
@@ -57,7 +61,7 @@ import { extendEchartsOpts } from "@/utils/model";
 const appHomeStore = homeStore();
 appHomeStore.title = "NFSC 数据统计";
 
-const appNsfcStatstore = nsfcStatstore();
+const appStore = nsfcStatstore();
 
 const addNewColume = (source: any, newName: string, callback: any) => {
   // first row is schema
@@ -390,7 +394,7 @@ const chart1Type = reactive({
   ],
 });
 
-let myChart1: echarts.ECharts, myChart2: echarts.ECharts;
+let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
   // 生成一些数据
@@ -401,16 +405,63 @@ const updateChart = _.debounce(async () => {
   });
 
   addNewColume(dataSetObj, "GDPZoom", (obj: any) => {
-    if (appNsfcStatstore.GDPvCPI) {
-      return _.round((obj.GDPM / appNsfcStatstore.GDPZoom / obj.CPI) * 100, 1);
+    if (appStore.GDPvCPI) {
+      return _.round((obj.GDPM / appStore.GDPZoom / obj.CPI) * 100, 1);
     }
-    return _.round(obj.GDPM / appNsfcStatstore.GDPZoom, 1);
+    return _.round(obj.GDPM / appStore.GDPZoom, 1);
   });
 
   addNewColume(dataSetObj, "FundVSGDP", (obj: any) => {
     return obj.FundM / obj.GDPM;
   });
 
+  let series: echarts.SeriesOption[] = [];
+  if (appStore.ShowNOI) {
+    series.push({
+      type: "line",
+      name: "项目数",
+      yAxisIndex: 0,
+      encode: {
+        x: "year",
+        y: "NumborOfProject",
+      },
+    });
+  }
+  if (appStore.ShowRatio) {
+    series.push({
+      type: "line",
+      name: "资金在 GDP 中占比",
+      yAxisIndex: 2,
+      encode: {
+        x: "year",
+        y: "FundVSGDP",
+      },
+    });
+  }
+  if (appStore.ShowFund) {
+    series.push({
+      type: "line",
+      name: appStore.FundMvCPI ? "资金数 CPI 加权" : "资金数",
+      yAxisIndex: 1,
+      encode: {
+        x: "year",
+        y: appStore.FundMvCPI ? "UfundM" : "FundM",
+      },
+    });
+  }
+  if (appStore.ShowGDP) {
+    series.push({
+      type: "line",
+      name: appStore.GDPvCPI
+        ? `GDP 加权CPI  缩小${appStore.GDPZoom}倍`
+        : `GDP 缩小${appStore.GDPZoom}倍`,
+      yAxisIndex: 1,
+      encode: {
+        x: "year",
+        y: "GDPZoom",
+      },
+    });
+  }
   let option = extendEchartsOpts({
     title: {
       left: "center",
@@ -473,48 +524,10 @@ const updateChart = _.debounce(async () => {
         return showHtm;
       },
     },
-    series: [
-      {
-        type: "line",
-        name: "项目数",
-        yAxisIndex: 0,
-        encode: {
-          x: "year",
-          y: "NumborOfProject",
-        },
-      },
-      {
-        type: "line",
-        name: appNsfcStatstore.FundMvCPI ? "资金数 CPI 加权" : "资金数",
-        yAxisIndex: 1,
-        encode: {
-          x: "year",
-          y: appNsfcStatstore.FundMvCPI ? "UfundM" : "fundM",
-        },
-      },
-      {
-        type: "line",
-        name: appNsfcStatstore.GDPvCPI
-          ? `GDP 加权CPI  缩小${appNsfcStatstore.GDPZoom}倍`
-          : `GDP 缩小${appNsfcStatstore.GDPZoom}倍`,
-        yAxisIndex: 1,
-        encode: {
-          x: "year",
-          y: "GDPZoom",
-        },
-      },
-      {
-        type: "line",
-        name: "资金在 GDP 中占比",
-        yAxisIndex: 2,
-        encode: {
-          x: "year",
-          y: "FundVSGDP",
-        },
-      },
-    ],
+    series,
   });
-  myChart1.setOption(option);
+  myChartObjs[0].clear();
+  myChartObjs[0].setOption(option);
 }, 1000);
 
 const updateNextChart = _.debounce(async () => {
@@ -655,22 +668,26 @@ const updateNextChart = _.debounce(async () => {
       }),
     });
   }
-  console.log(option);
-  myChart2.clear();
-  myChart2.setOption(option);
+  myChartObjs[1].clear();
+  myChartObjs[1].setOption(option);
 }, 1000);
 
 onMounted(() => {
   let elem = document.getElementById("echart1");
   if (elem) {
-    myChart1 = echarts.init(elem);
+    myChartObjs.push(echarts.init(elem));
   }
   elem = document.getElementById("echart2");
   if (elem) {
-    myChart2 = echarts.init(elem);
+    myChartObjs.push(echarts.init(elem));
   }
   updateChart();
   updateNextChart();
+  window.onresize = _.debounce(() => {
+    myChartObjs.forEach((element) => {
+      element.resize();
+    });
+  }, 500);
 });
 </script>
 

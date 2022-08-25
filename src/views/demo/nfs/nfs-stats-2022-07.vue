@@ -5,30 +5,30 @@ el-container
       el-col(:span="8")
         el-form.radius(label-position="left" label-width="auto")
           el-form-item(label="GDP:" size="large")
-            el-checkbox(v-model="appNsfStatstore.ShowGDP", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.ShowGDP", size="large",  @change='updateChart')
 
           el-form-item(label="选项:" size="large")
-            el-checkbox(v-model="appNsfStatstore.GDPvCPI",size="large",label="CPI加权",:disabled="!appNsfStatstore.ShowGDP",  @change='updateChart')
+            el-checkbox(v-model="appStore.GDPvCPI",size="large",label="CPI加权",:disabled="!appStore.ShowGDP",  @change='updateChart')
 
           el-form-item(label="GDP 缩小倍数:" size="large")
-            el-input-number(v-model="appNsfStatstore.GDPZoom",:min=100,:max=10000 ,:step=100, size="default",:disabled="!appNsfStatstore.ShowGDP", @change='updateChart')
+            el-input-number(v-model="appStore.GDPZoom",:min=100,:max=10000 ,:step=100, size="default",:disabled="!appStore.ShowGDP", @change='updateChart')
 
       el-col(:span="6")
         el-form.radius(label-position="left" label-width="auto")
           el-form-item(label="资金数:" size="large")
-            el-checkbox(v-model="appNsfStatstore.ShowFund", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.ShowFund", size="large",  @change='updateChart')
           el-form-item(label="选项:" size="large")
-            el-checkbox(v-model="appNsfStatstore.FundMvCPI",size="large",label="CPI加权",:disabled="!appNsfStatstore.ShowFund",  @change='updateChart')
+            el-checkbox(v-model="appStore.FundMvCPI",size="large",label="CPI加权",:disabled="!appStore.ShowFund",  @change='updateChart')
 
       el-col(:span="4")
         el-form.radius(label-position="left")
           el-form-item(label="项目数:" size="large")
-            el-checkbox(v-model="appNsfStatstore.ShowNOI", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.ShowNOI", size="large",  @change='updateChart')
 
       el-col(:span="4")
         el-form.radius(label-position="left")
           el-form-item(label="资金GDP比例:" size="large")
-            el-checkbox(v-model="appNsfStatstore.ShowRatio", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.ShowRatio", size="large",  @change='updateChart')
           
     el-row
       el-col(:span="24")
@@ -62,7 +62,7 @@ import { extendEchartsOpts } from "@/utils/model";
 const appHomeStore = homeStore();
 appHomeStore.title = "NFS 数据统计";
 
-const appNsfStatstore = nsfStatstore();
+const appStore = nsfStatstore();
 
 const addNewColume = (source: any, newName: string, callback: any) => {
   // first row is schema
@@ -2268,10 +2268,10 @@ const updateChart = _.debounce(async () => {
     return _.round((obj.fundM / obj.CPI) * 100, 1);
   });
   addNewColume(dataSetObj, "GDPZoom", (obj: any) => {
-    if (appNsfStatstore.GDPvCPI) {
-      return _.round((obj.GDPM / appNsfStatstore.GDPZoom / obj.CPI) * 100, 1);
+    if (appStore.GDPvCPI) {
+      return _.round((obj.GDPM / appStore.GDPZoom / obj.CPI) * 100, 1);
     }
-    return _.round(obj.GDPM / appNsfStatstore.GDPZoom, 1);
+    return _.round(obj.GDPM / appStore.GDPZoom, 1);
   });
 
   addNewColume(dataSetObj, "FundVSGDP", (obj: any) => {
@@ -2279,7 +2279,7 @@ const updateChart = _.debounce(async () => {
   });
 
   let series: echarts.SeriesOption[] = [];
-  if (appNsfStatstore.ShowNOI) {
+  if (appStore.ShowNOI) {
     series.push({
       type: "line",
       name: "项目数",
@@ -2290,7 +2290,7 @@ const updateChart = _.debounce(async () => {
       },
     });
   }
-  if (appNsfStatstore.ShowRatio) {
+  if (appStore.ShowRatio) {
     series.push({
       type: "line",
       name: "资金在 GDP 中占比",
@@ -2302,24 +2302,24 @@ const updateChart = _.debounce(async () => {
     });
   }
 
-  if (appNsfStatstore.ShowFund) {
+  if (appStore.ShowFund) {
     series.push({
       type: "line",
-      name: appNsfStatstore.FundMvCPI ? "资金数 CPI 加权" : "资金数",
+      name: appStore.FundMvCPI ? "资金数 CPI 加权" : "资金数",
       yAxisIndex: 1,
       encode: {
         x: "year",
-        y: appNsfStatstore.FundMvCPI ? "UfundM" : "fundM",
+        y: appStore.FundMvCPI ? "UfundM" : "fundM",
       },
     });
   }
 
-  if (appNsfStatstore.ShowGDP) {
+  if (appStore.ShowGDP) {
     series.push({
       type: "line",
-      name: appNsfStatstore.GDPvCPI
-        ? `GDP 加权CPI  缩小${appNsfStatstore.GDPZoom}倍`
-        : `GDP 缩小${appNsfStatstore.GDPZoom}倍`,
+      name: appStore.GDPvCPI
+        ? `GDP 加权CPI  缩小${appStore.GDPZoom}倍`
+        : `GDP 缩小${appStore.GDPZoom}倍`,
       yAxisIndex: 1,
       encode: {
         x: "year",

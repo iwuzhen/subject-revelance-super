@@ -27,8 +27,8 @@ export const nsfStatstore = defineStore("nsfStatsDemo", {
     return {
       GDPvCPI: ref(false),
       FundMvCPI: ref(false),
-      ShowGDP: ref(true),
       GDPZoom: ref(3000),
+      ShowGDP: ref(true),
       ShowFund: ref(true),
       ShowNOI: ref(true),
       ShowRatio: ref(true),
@@ -51,6 +51,10 @@ export const nsfcStatstore = defineStore("nsfcStatsDemo", {
       GDPvCPI: ref(false),
       FundMvCPI: ref(false),
       GDPZoom: ref(800),
+      ShowGDP: ref(true),
+      ShowFund: ref(true),
+      ShowNOI: ref(true),
+      ShowRatio: ref(true),
     };
   },
   persist: {
