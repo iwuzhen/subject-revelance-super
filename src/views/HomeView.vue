@@ -15,16 +15,16 @@ el-container
 
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
+import dayjs from "dayjs";
 const appHomeStore = homeStore();
 appHomeStore.title = "wiki";
-import dayjs from "dayjs";
 
 let pageData = [
   {
-    title: "NFS-stats-2022-07",
-    text: "NFS 数据统计",
+    title: "NSF-stats-2022-07",
+    text: "NSF 数据统计",
     update: "2022-07-22T09:43:03.429Z",
-    href: "/demo/nfs/nfs-stats-2022-07",
+    href: "/demo/nsf/nsf-stats-2022-07",
   },
 ];
 pageData = [];

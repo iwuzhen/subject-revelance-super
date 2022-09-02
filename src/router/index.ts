@@ -7,21 +7,6 @@ const routes: Array<RouteRecordRaw> = [
     name: "Homw",
     component: HomeView,
   },
-  // {
-  //   path: "/demo/animation/power-law-2022",
-  //   name: "power-law-2022",
-  //   component: () => import("@/views/demo/animations/power-law-2022.vue"),
-  // },
-  // {
-  //   path: "/demo/browser/mag-fos-2022",
-  //   name: "mag-fos-2022",
-  //   component: () => import("@/views/demo/browser/mag-fos-2022.vue"),
-  // },
-  // {
-  //   path: "/demo/nfs/nfs-stats-2022-07",
-  //   name: "nfs-stats-2022-07",
-  //   component: () => import("@/views/demo/nfs/nfs-stats-2022-07.vue"),
-  // },
 ];
 
 // 自动读取views文件夹下的所有vue文件

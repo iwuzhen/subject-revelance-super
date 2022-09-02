@@ -49,6 +49,7 @@ const externals = {
 
 module.exports = defineConfig({
   publicPath: "/v2/",
+  assetsDir: "assets",
   transpileDependencies: true,
   configureWebpack: {
     externals: IS_PRODUCTION ? externals : {},

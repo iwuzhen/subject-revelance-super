@@ -2,33 +2,38 @@
 el-container
   el-main
     el-row
-      el-col(:span="8")
+      el-col(:span="6")
         el-form.radius(label-position="left" label-width="auto")
           el-form-item(label="GDP:" size="large")
-            el-checkbox(v-model="appStore.ShowGDP", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.states.ShowGDP", size="large",  @change='updateChart')
 
           el-form-item(label="选项:" size="large")
-            el-checkbox(v-model="appStore.GDPvCPI",size="large",label="CPI加权",:disabled="!appStore.ShowGDP",  @change='updateChart')
+            el-checkbox(v-model="appStore.states.GDPvCPI",size="large",label="CPI加权",:disabled="!appStore.states.ShowGDP",  @change='updateChart')
 
           el-form-item(label="GDP 缩小倍数:" size="large")
-            el-input-number(v-model="appStore.GDPZoom",:min=100,:max=10000 ,:step=100, size="default",:disabled="!appStore.ShowGDP", @change='updateChart')
+            el-input-number(v-model="appStore.states.GDPZoom",:min=100,:max=10000 ,:step=100, size="default",:disabled="!appStore.states.ShowGDP", @change='updateChart')
 
       el-col(:span="6")
         el-form.radius(label-position="left" label-width="auto")
           el-form-item(label="资金数:" size="large")
-            el-checkbox(v-model="appStore.ShowFund", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.states.ShowFund", size="large",  @change='updateChart')
           el-form-item(label="选项:" size="large")
-            el-checkbox(v-model="appStore.FundMvCPI",size="large",label="CPI加权",:disabled="!appStore.ShowFund",  @change='updateChart')
+            el-checkbox(v-model="appStore.states.FundMvCPI",size="large",label="CPI加权",:disabled="!appStore.states.ShowFund",  @change='updateChart')
 
+      el-col(:span="4")
+        el-form.radius(label-position="left")
+          el-form-item(label="NIH 资金数:" size="large")
+            el-checkbox(v-model="appStore.states.showNIH", size="large",  @change='updateChart')
+          el-form-item(label="NIH占GDP比例:" size="large")
+            el-checkbox(v-model="appStore.states.showNIHDivGDP", size="large",  @change='updateChart')
       el-col(:span="4")
         el-form.radius(label-position="left")
           el-form-item(label="项目数:" size="large")
-            el-checkbox(v-model="appStore.ShowNOI", size="large",  @change='updateChart')
-
+            el-checkbox(v-model="appStore.states.ShowNOI", size="large",  @change='updateChart')
       el-col(:span="4")
         el-form.radius(label-position="left")
           el-form-item(label="资金GDP比例:" size="large")
-            el-checkbox(v-model="appStore.ShowRatio", size="large",  @change='updateChart')
+            el-checkbox(v-model="appStore.states.ShowRatio", size="large",  @change='updateChart')
           
     el-row
       el-col(:span="24")
@@ -45,354 +50,36 @@ el-container
 
 <script lang="ts">
 export default {
-  name: "NFS-stats-2022-07",
+  name: "NSF-stats-2022-07",
   autoIndex: true,
-  text: "NFS 数据统计",
+  text: "NSF 数据统计",
   update: "2022-07-21T09:43:03.429Z",
 };
 </script>
 
 <script setup lang="ts">
-import { homeStore, nsfStatstore } from "@/pinia/modules/pageStore";
+import { homeStore, dynamicStore } from "@/pinia/modules/pageStore";
 import _ from "lodash";
 import { reactive, onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
+import { dataSetAddNewColume } from "@/utils/echartsTool";
+import axios from "@/utils/requests";
 
 const appHomeStore = homeStore();
-appHomeStore.title = "NFS 数据统计";
+appHomeStore.title = "NSF 数据统计";
 
-const appStore = nsfStatstore();
-
-const addNewColume = (source: any, newName: string, callback: any) => {
-  // first row is schema
-  let indexMap = {};
-  for (let i in source[0]) {
-    indexMap[source[0][i]] = [i];
-  }
-  for (let i = 1; i < source.length; i++) {
-    let obj = {};
-    for (let key in indexMap) {
-      obj[key] = source[i][indexMap[key]];
-    }
-    source[i].push(callback(obj));
-  }
-  source[0].push(newName);
-};
-
-let dataSet = [
-  ["year", "NOI", "fundM", "CPI", "GDPM"],
-  [1960, 3776, 129.985739, 13.56306078, 543300],
-  [1961, 3983, 135.536919, 13.70828375, 563300],
-  [1962, 5083, 214.017773, 13.872615, 605100],
-  [1963, 5782, 258.429815, 14.04458957, 638600],
-  [1964, 7325, 375.044366, 14.22420745, 685800],
-  [1965, 6118, 297.357953, 14.44968521, 743700],
-  [1966, 6975, 372.438833, 14.88535411, 815000],
-  [1967, 6879, 760.268811, 15.29809307, 861700],
-  [1968, 7126, 533.184223, 15.95159642, 942500],
-  [1969, 7164, 455.359689, 16.82293422, 1019900],
-  [1970, 8215, 436.708039, 17.80510008, 1073303],
-  [1971, 8170, 663.906259, 18.56943148, 1164850],
-  [1972, 10540, 1000.152812, 19.17707495, 1279110],
-  [1973, 10645, 837.818861, 20.36178863, 1425376],
-  [1974, 13115, 1105.634132, 22.61274461, 1545243],
-  [1975, 7015, 531.172638, 24.68026107, 1684904],
-  [1976, 7115, 1565.273069, 26.09809582, 1873412],
-  [1977, 8277, 921.804244, 27.79491154, 2081826],
-  [1978, 8223, 922.824786, 29.91593119, 2351599],
-  [1979, 8087, 1127.37549, 33.28281103, 2627333],
-  [1980, 8100, 912.692121, 37.79236632, 2857307],
-  [1981, 7532, 1004.383978, 41.6980998, 3207041],
-  [1982, 6264, 1105.167752, 44.25478835, 3343789],
-  [1983, 6743, 942.218822, 45.67644476, 3634038],
-  [1984, 7782, 1941.194228, 47.64077647, 4037613],
-  [1985, 8387, 1478.565272, 49.32994887, 4338979],
-  [1986, 7589, 1372.858267, 50.26625484, 4579631],
-  [1987, 8467, 2010.136245, 52.10829353, 4855215],
-  [1988, 8356, 1542.692795, 54.23313484, 5236438],
-  [1989, 8920, 3181.892963, 56.8509699, 5641580],
-  [1990, 9642, 2280.522466, 59.91976049, 5963144],
-  [1991, 10764, 2539.991323, 62.45734075, 6158129],
-  [1992, 10755, 3122.12888, 64.34906098, 6520327],
-  [1993, 9663, 2857.700927, 66.24842452, 6858559],
-  [1994, 10416, 3353.263631, 67.9758135, 7287236],
-  [1995, 9815, 2652.168452, 69.88282035, 7639749],
-  [1996, 9532, 2830.0718, 71.93122852, 8073122],
-  [1997, 10188, 4095.887349, 73.61275761, 8577554],
-  [1998, 9890, 3286.029488, 74.75543306, 9062818],
-  [1999, 9600, 5134.541151, 76.39110227, 9631174],
-  [2000, 10432, 4538.145928, 78.97072076, 10250948],
-  [2001, 10428, 5873.983309, 81.20256846, 10581930],
-  [2002, 10945, 5323.313075, 82.49046688, 10929113],
-  [2003, 11592, 6476.695386, 84.36307882, 11456442],
-  [2004, 10926, 4963.672504, 86.62167812, 12217193],
-  [2005, 10412, 5141.969532, 89.56053237, 13039199],
-  [2006, 10886, 5486.255589, 92.44970508, 13815587],
-  [2007, 12122, 5225.36562, 95.08699238, 14474227],
-  [2008, 11746, 7208.0825, 98.73747739, 14769858],
-  [2009, 15241, 8031.160468, 98.38641997, 14478065],
-  [2010, 13821, 7478.627625, 100, 15048964],
-  [2011, 11953, 6681.19133, 103.1568416, 15599728],
-  [2012, 12306, 6215.17935, 105.2915045, 16253972],
-  [2013, 11703, 5806.421998, 106.8338489, 16843191],
-  [2014, 11984, 6485.451359, 108.5669321, 17550680],
-  [2015, 12929, 5863.173113, 108.695722, 18206021],
-  [2016, 12994, 7105.548273, 110.0670089, 18695111],
-  [2017, 12203, 7001.69692, 112.4115573, 19479620],
-  [2018, 12622, 8043.733005, 115.1573032, 20527156],
-  [2019, 12163, 5960.158723, 117.2441955, 21372572],
-  [2020, 12804, 5806.112265, 118.6905016, 20893744],
-  [2021, 12300, 5423.631686, 124.2664138, 22996100],
-];
-
-// NSF Directorate  资金分布
-let dataSet1 = [
-  [
-    "year",
-    "Direct For Mathematical & Physical Scien",
-    "Direct For Geosciences",
-    "Direct For Education and Human Resources",
-    "Direct For Computer & Info Scie & Enginr",
-    "Direct For Biological Sciences",
-    "Direct For Engineering",
-    "Direct For Social, Behav & Economic Scie",
-    "Office Of The Director",
-    "Dir for Tech, Innovation, & Partnerships",
-    "Office Of Information & Resource Mgmt",
-    "Office of Budget, Finance, & Award Management",
-    "National Coordination Office",
-    "Natl Nanotechnology Coordinating Office",
-    "Office Of Polar Programs",
-  ],
-  [1960, 0, 0, 0, 0.125, 0, 0, 0, 4.012, 0, 0, 0, 0, 0, 0],
-  [1961, 0, 0, 0, 0.485, 0, 0, 0, 0.078, 0, 0, 0, 0, 0, 0],
-  [1962, 0, 0, 0, 1.87, 0, 0, 0, 0.09, 0, 0, 0, 0, 0, 0],
-  [1963, 0.412, 2.305, 0, 4.563, 0.015, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  [1964, 0.033, 0.091, 0, 2.676, 0, 0, 0.234, 0, 0, 0, 0, 0, 0, 0],
-  [1965, 0, 0.065, 0, 5.725, 0.144, 0, 0, 0.008, 0, 0, 7.265, 0, 0, 0],
-  [1966, 0.24, 0.042, 0, 0.381, 0.037, 0, 0, 6.6, 0, 0, 0, 0, 0, 0],
-  [
-    1967, 84.777, 223.777, 0, 18.813, 1.526, 7.314, 2.853, 19.622, 0, 0, 1.131,
-    0, 0, 0,
-  ],
-  [
-    1968, 81.236, 0.967, 0, 3.073, 0.917, 4.878, 0, 11.987, 0, 0, 2.675, 0, 0,
-    0,
-  ],
-  [
-    1969, 51.172, 0.721, 0, 12.689, 0.73, 39.627, 0.973, 6.826, 0, 0, 0.966, 0,
-    0, 0,
-  ],
-  [
-    1970, 7.111, 14.684, 0, 10.789, 7.416, 3.153, 1, 4.976, 0, 0.003, 0.247, 0,
-    0, 0,
-  ],
-  [
-    1971, 41.149, 97.513, 0.382, 12.065, 14.572, 62.905, 2.932, 9.182, 0, 0.179,
-    0.242, 0, 0, 0,
-  ],
-  [
-    1972, 178.214, 81.858, 0.724, 32.089, 29.564, 76.687, 4.337, 20.64, 0, 0,
-    0.027, 0, 0, 0,
-  ],
-  [
-    1973, 66.159, 43.699, 3.676, 12.624, 26.891, 84.811, 10.28, 24.49, 0, 0,
-    0.087, 0, 0, 0,
-  ],
-  [
-    1974, 209.699, 87.048, 3.7, 56.455, 59.505, 76.784, 19.239, 14.04, 0, 0, 0,
-    0, 0, 0,
-  ],
-  [
-    1975, 112.706, 87.058, 2.03, 65.387, 91.261, 81.201, 16.499, 18.048, 0, 0,
-    0, 0, 0, 0,
-  ],
-  [
-    1976, 151.786, 1120.185, 3.109, 74.42, 85.837, 83.218, 29.286, 16.668, 0, 0,
-    0.067, 0, 0, 0,
-  ],
-  [
-    1977, 254.739, 287.134, 6.958, 97.531, 107.304, 93.229, 40.444, 31.067, 0,
-    0, 0, 0, 0, 0,
-  ],
-  [
-    1978, 291.989, 239.101, 10.892, 102.876, 128.984, 74.575, 41.892, 28.467, 0,
-    0, 0.114, 0, 0, 0,
-  ],
-  [
-    1979, 354.878, 350.288, 8.164, 101.247, 131.991, 99.439, 37.918, 41.984, 0,
-    0.03, 0, 0, 0, 0,
-  ],
-  [
-    1980, 284.293, 139.728, 14.637, 120.289, 154.053, 111.467, 41.933, 43.518,
-    0, 0.041, 0.233, 0, 0, 0,
-  ],
-  [
-    1981, 356.703, 220.913, 2.748, 113.454, 150.966, 92.631, 33.044, 32.929,
-    0.1, 0.095, 0.005, 0, 0, 0,
-  ],
-  [
-    1982, 288.788, 406.947, 18.133, 51.789, 146.056, 123.676, 32.197, 36.607,
-    0.378, 0.176, 0.016, 0, 0, 0,
-  ],
-  [
-    1983, 361.364, 155.306, 27.693, 56.364, 159.353, 105.055, 34.257, 40.811,
-    0.699, 0, 0, 0, 0, 0,
-  ],
-  [
-    1984, 674.964, 659.096, 78.163, 81.867, 215.634, 128.533, 57.427, 42.564,
-    1.854, 0, 0, 0, 0, 0,
-  ],
-  [
-    1985, 361.664, 225.023, 122.065, 282.453, 217.936, 177.5, 47.642, 38.399,
-    4.156, 0.006, 0, 0, 0, 0,
-  ],
-  [
-    1986, 477.766, 156.198, 127.19, 113.733, 192.833, 177.709, 61.635, 49.525,
-    13.675, 0, 0, 0, 0, 0,
-  ],
-  [
-    1987, 413.251, 736.393, 142.106, 149.104, 224.152, 215.672, 54.828, 32.914,
-    17.549, 0, 0, 0, 0, 0,
-  ],
-  [
-    1988, 382.197, 189.422, 205.473, 80.695, 225.507, 319.547, 58.049, 57.912,
-    17.199, 0, 0.05, 0, 0, 0,
-  ],
-  [
-    1989, 994.943, 1084.625, 235.931, 247.866, 261.915, 237.46, 53.873, 46.54,
-    17.812, 0, 0, 0, 0, 0,
-  ],
-  [
-    1990, 583.854, 327.786, 247.222, 478.573, 235.468, 270.764, 53.902, 55.407,
-    19.513, 0.005, 0, 0, 0, 0,
-  ],
-  [
-    1991, 625.782, 490.477, 506.85, 157.388, 332.468, 209.778, 105.355, 82.196,
-    24.748, 0.01, 0, 0, 0, 0,
-  ],
-  [
-    1992, 1056.286, 268.413, 845.74, 212.974, 275.57, 269.502, 103.998, 64.241,
-    23.662, 0.005, 0, 0, 0, 0,
-  ],
-  [
-    1993, 582.275, 867.729, 413.537, 159.17, 274.965, 175.943, 78.852, 274.219,
-    28.611, 0.028, 0, 0, 0, 0,
-  ],
-  [
-    1994, 1081.198, 522.293, 600.238, 198.198, 324.177, 392.18, 86.922, 100.549,
-    35.613, 1.279, 0.012, 0, 0, 0,
-  ],
-  [
-    1995, 468.63, 264.103, 666.303, 229.978, 295.575, 208.161, 92.079, 373.685,
-    44.069, 0, 0.014, 0, 0, 0,
-  ],
-  [
-    1996, 700.291, 412.923, 677.164, 149.282, 305.414, 338.224, 132.661, 58.385,
-    49.481, 0.226, 0.013, 0.76, 0, 0,
-  ],
-  [
-    1997, 697.805, 1281.841, 468.172, 739.308, 319.589, 337.884, 128.988,
-    59.232, 57.107, 4.523, 0.224, 1.114, 0, 0,
-  ],
-  [
-    1998, 612.427, 805.67, 535.29, 233.209, 439.736, 399.43, 104.863, 93.805,
-    58.055, 1.669, 0.012, 1.864, 0, 0,
-  ],
-  [
-    1999, 837.976, 2404.609, 590.555, 307.55, 459.799, 290.096, 123.566, 48.951,
-    68.228, 2.64, 0.064, 0.461, 0, 0,
-  ],
-  [
-    2000, 837.09, 1359.454, 644.696, 554.332, 506.754, 382.947, 119.01, 46.119,
-    81.82, 1.11, 0.064, 4.75, 0, 0,
-  ],
-  [
-    2001, 2185.499, 685.032, 1154.792, 527.435, 519.413, 398.79, 210.957,
-    85.082, 103.46, 3.053, 0.018, 0.453, 0, 0,
-  ],
-  [
-    2002, 1334.403, 1076.581, 975.104, 558.65, 575.633, 405.044, 198.888,
-    91.875, 88.269, 18.844, 0.022, 0, 0, 0,
-  ],
-  [
-    2003, 1005.84, 2131.135, 1081.275, 680.419, 644.9, 546.92, 138.023, 95.014,
-    128.18, 18.907, 0.017, 6, 0, 0,
-  ],
-  [
-    2004, 813.987, 968.684, 916.874, 464.473, 703.747, 661.134, 251.016, 62.698,
-    115.988, 2.488, 0.901, 0, 0, 0,
-  ],
-  [
-    2005, 1075.47, 1160.816, 664.85, 815.538, 605.452, 325.853, 203.03, 137.848,
-    106.489, 22.612, 0.854, 22.105, 0, 0,
-  ],
-  [
-    2006, 1407.999, 929.619, 1008.23, 484.085, 632.741, 582.267, 245.348,
-    86.186, 98.185, 2.45, 7.604, 0, 0, 0,
-  ],
-  [
-    2007, 1007.665, 762.762, 865.222, 853.802, 563.326, 430.532, 261.369,
-    149.66, 114.843, 212.223, 0.842, 0.837, 0.35, 0,
-  ],
-  [
-    2008, 1778.592, 1961.83, 1027.169, 557.701, 718.693, 628.949, 231.61,
-    172.08, 126.663, 0.588, 1.056, 0.919, 0, 0,
-  ],
-  [
-    2009, 2124.626, 1526.036, 1106.62, 933.554, 931.772, 798.893, 273.746,
-    189.538, 134.579, 3.642, 2.153, 0.003, 0, 0,
-  ],
-  [
-    2010, 1655.938, 1337.106, 1173.362, 934.851, 816.754, 645.186, 368.686,
-    370.781, 167.512, 5.097, 3.351, 0, 0, 0,
-  ],
-  [
-    2011, 1278.042, 841.037, 1432.733, 829.282, 1077.887, 664.9, 248.094,
-    130.204, 164.361, 9.216, 0.56, 0, 0, 0,
-  ],
-  [
-    2012, 1175.045, 1466.422, 1053.408, 781.419, 578.046, 674.104, 209.513,
-    123.219, 146.843, 3.326, 1.317, 0, 0, 0,
-  ],
-  [
-    2013, 1043.881, 1007.373, 875.086, 1032.108, 759.109, 494.459, 193.212,
-    186.249, 201.167, 7.486, 0.947, 0, 0, 0.035,
-  ],
-  [
-    2014, 1754.404, 1206.519, 809.296, 801.187, 651.357, 525.352, 240.291,
-    262.406, 228.999, 0.975, 3.014, 0.284, 1.133, 0.038,
-  ],
-  [
-    2015, 1381.97, 653.082, 786.524, 910.896, 660.255, 804.041, 257.835,
-    193.733, 193.094, 20.446, 0.836, 0, 0.444, 0,
-  ],
-  [
-    2016, 1603.382, 724.33, 1375.831, 1012.869, 984.687, 699.067, 240.013,
-    163.178, 287.075, 8.653, 1.148, 0, 0, 0,
-  ],
-  [
-    2017, 1331.954, 1127.986, 1279.621, 873.295, 933.725, 724.87, 258.798,
-    225.245, 236.791, 8.519, 0.875, 0, 0, 0,
-  ],
-  [
-    2018, 1600.66, 1968.998, 1336.529, 1040.611, 645.903, 672.667, 245.228,
-    213.899, 244.032, 65.935, 2.329, 1.491, 2.174, 0,
-  ],
-  [
-    2019, 1110.088, 880.204, 929.312, 1106.07, 625.833, 631.398, 244.673,
-    136.035, 284.118, 8.882, 3.504, 0.017, 0.013, 0,
-  ],
-  [
-    2020, 1179.418, 634.83, 846.208, 941.52, 683.435, 757.043, 286.526, 112.957,
-    330.975, 30.936, 2.181, 0, 0, 0,
-  ],
-  [
-    2021, 900.5, 720.227, 926.785, 842.757, 658.226, 731.403, 243.495, 75.048,
-    314.724, 7.816, 2.597, 0, 0, 0,
-  ],
-];
+const appStore = dynamicStore("nsfStatsDemo", {
+  showNIH: true,
+  ShowGDP: true,
+  ShowFund: true,
+  ShowNOI: true,
+  ShowRatio: true,
+  showNIHDivGDP: true,
+  FundMvCPI: false,
+  GDPvCPI: false,
+  GDPZoom: 3000,
+});
 
 // NSF Directorate  项目数量逐年分布
 let dataSet6 = [
@@ -2211,49 +1898,41 @@ const chart1Type = reactive({
       text: "NSF Directorate 资金逐年分布",
       value: 0,
       yName: "百万美元",
-      dataSet: dataSet1,
     },
     {
       text: "NSF 一级学科资金数",
       value: 1,
       yName: "百万美元",
-      dataSet: dataSet2,
     },
     {
       text: "NSF 一级学科项目数",
       value: 2,
       yName: "个",
-      dataSet: dataSet3,
     },
     {
       text: "NSF 二级学科资金数",
       value: 3,
       yName: "百万美元",
-      dataSet: dataSet4,
     },
     {
       text: "NSF 二级学科项目数",
       value: 4,
       yName: "个",
-      dataSet: dataSet5,
     },
     {
       text: "NSF Directorate 项目数量逐年分布",
       value: 5,
       yName: "个",
-      dataSet: dataSet6,
     },
     {
       text: "NSF Division 资金逐年分布",
       value: 6,
       yName: "个",
-      dataSet: dataSet7,
     },
     {
       text: "NSF Division 项目数量逐年分布",
       value: 7,
       yName: "个",
-      dataSet: dataSet8,
     },
   ],
 });
@@ -2261,26 +1940,36 @@ const chart1Type = reactive({
 let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
-  // 生成一些数据
-  // ["year", "Fund", "NumborOfProject", "CPI", "GDP", "UfundM"],
-  const dataSetObj = _.cloneDeep(dataSet);
-  addNewColume(dataSetObj, "UfundM", (obj: any) => {
+  // 项目和资金数
+  let response = await axios.get("static/data/nsf/fund-and-project.json");
+  let dataSet = response.data;
+  dataSetAddNewColume(dataSet, "UfundM", (obj: any) => {
     return _.round((obj.fundM / obj.CPI) * 100, 1);
   });
-  addNewColume(dataSetObj, "GDPZoom", (obj: any) => {
-    if (appStore.GDPvCPI) {
-      return _.round((obj.GDPM / appStore.GDPZoom / obj.CPI) * 100, 1);
+  dataSetAddNewColume(dataSet, "GDPZoom", (obj: any) => {
+    if (appStore.states.GDPvCPI) {
+      return _.round((obj.GDPM / appStore.states.GDPZoom / obj.CPI) * 100, 1);
     }
-    return _.round(obj.GDPM / appStore.GDPZoom, 1);
+    return _.round(obj.GDPM / appStore.states.GDPZoom, 1);
   });
-
-  addNewColume(dataSetObj, "FundVSGDP", (obj: any) => {
+  dataSetAddNewColume(dataSet, "FundVSGDP", (obj: any) => {
     return obj.fundM / obj.GDPM;
   });
 
+  // NIH 资金数
+  response = await axios.get("static/data/nih/appropriations.json");
+  let dataSet_nih = response.data;
+  dataSetAddNewColume(dataSet_nih, "TotalM", (obj: any) => {
+    return obj.Total / 1000;
+  });
+  dataSetAddNewColume(dataSet_nih, "NIHVSGDP", (obj: any) => {
+    return obj.Total / obj.GDPM / 1000;
+  });
+
   let series: echarts.SeriesOption[] = [];
-  if (appStore.ShowNOI) {
+  if (appStore.states.ShowNOI) {
     series.push({
+      datasetIndex: 0,
       type: "line",
       name: "项目数",
       yAxisIndex: 0,
@@ -2290,10 +1979,11 @@ const updateChart = _.debounce(async () => {
       },
     });
   }
-  if (appStore.ShowRatio) {
+  if (appStore.states.ShowRatio) {
     series.push({
+      datasetIndex: 0,
       type: "line",
-      name: "资金在 GDP 中占比",
+      name: "NSF 在 GDP 中占比",
       yAxisIndex: 2,
       encode: {
         x: "year",
@@ -2301,29 +1991,53 @@ const updateChart = _.debounce(async () => {
       },
     });
   }
-
-  if (appStore.ShowFund) {
+  if (appStore.states.ShowFund) {
     series.push({
+      datasetIndex: 0,
       type: "line",
-      name: appStore.FundMvCPI ? "资金数 CPI 加权" : "资金数",
+      name: appStore.states.FundMvCPI ? "资金数 CPI 加权" : "资金数",
       yAxisIndex: 1,
       encode: {
         x: "year",
-        y: appStore.FundMvCPI ? "UfundM" : "fundM",
+        y: appStore.states.FundMvCPI ? "UfundM" : "fundM",
       },
     });
   }
-
-  if (appStore.ShowGDP) {
+  if (appStore.states.ShowGDP) {
     series.push({
+      datasetIndex: 0,
       type: "line",
-      name: appStore.GDPvCPI
-        ? `GDP 加权CPI  缩小${appStore.GDPZoom}倍`
-        : `GDP 缩小${appStore.GDPZoom}倍`,
+      name: appStore.states.GDPvCPI
+        ? `GDP 加权CPI  缩小${appStore.states.GDPZoom}倍`
+        : `GDP 缩小${appStore.states.GDPZoom}倍`,
       yAxisIndex: 1,
       encode: {
         x: "year",
         y: "GDPZoom",
+      },
+    });
+  }
+  if (appStore.states.showNIH) {
+    series.push({
+      datasetIndex: 1,
+      type: "line",
+      name: "NIH 资金数",
+      yAxisIndex: 1,
+      encode: {
+        x: "FY",
+        y: "TotalM",
+      },
+    });
+  }
+  if (appStore.states.showNIHDivGDP) {
+    series.push({
+      datasetIndex: 1,
+      type: "line",
+      name: "NIH 在 GDP 中占比",
+      yAxisIndex: 2,
+      encode: {
+        x: "year",
+        y: "NIHVSGDP",
       },
     });
   }
@@ -2339,8 +2053,9 @@ const updateChart = _.debounce(async () => {
       text: "NSF 项目数和资金数",
     },
     xAxis: {
-      // max: 5,
-      type: "category",
+      max: 2020,
+      min: 1960,
+      type: "value",
     },
     legend: {
       show: true,
@@ -2360,9 +2075,14 @@ const updateChart = _.debounce(async () => {
         show: false,
       },
     ],
-    dataset: {
-      source: dataSetObj,
-    },
+    dataset: [
+      {
+        source: dataSet,
+      },
+      {
+        source: dataSet_nih,
+      },
+    ],
     tooltip: {
       formatter: function (params: any) {
         params.sort((x: any, y: any) => {
@@ -2399,6 +2119,20 @@ const updateChart = _.debounce(async () => {
 }, 1000);
 
 const updateNextChart = _.debounce(async () => {
+  // NSF Directorate  资金分布
+  let response = await axios.get("static/data/nsf/directorate-fund.json");
+  let dataSet1 = response.data;
+  let dataSetArray = [
+    dataSet1,
+    dataSet2,
+    dataSet3,
+    dataSet4,
+    dataSet5,
+    dataSet6,
+    dataSet7,
+    dataSet8,
+  ];
+
   // directoract 资金分布
   let dataID = chart1Type.select;
   const option = extendEchartsOpts({
@@ -2423,7 +2157,7 @@ const updateNextChart = _.debounce(async () => {
       name: chart1Type.opt[dataID].yName,
     },
     dataset: {
-      source: chart1Type.opt[dataID].dataSet,
+      source: dataSetArray[dataID],
     },
     tooltip: {
       formatter: function (params: any) {
@@ -2449,7 +2183,7 @@ const updateNextChart = _.debounce(async () => {
         return showHtm;
       },
     },
-    series: chart1Type.opt[dataID].dataSet[0].slice(1, -1).map(() => {
+    series: dataSetArray[dataID][0].slice(1, -1).map(() => {
       return { type: "line" };
     }),
   });

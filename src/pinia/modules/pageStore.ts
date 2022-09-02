@@ -22,29 +22,6 @@ export const powerlawDemoStore = defineStore("powerlawDemo", {
   },
 });
 
-export const nsfStatstore = defineStore("nsfStatsDemo", {
-  state() {
-    return {
-      GDPvCPI: ref(false),
-      FundMvCPI: ref(false),
-      GDPZoom: ref(3000),
-      ShowGDP: ref(true),
-      ShowFund: ref(true),
-      ShowNOI: ref(true),
-      ShowRatio: ref(true),
-    };
-  },
-  persist: {
-    enabled: true,
-    strategies: [
-      {
-        key: "page",
-        storage: localStorage,
-      },
-    ],
-  },
-});
-
 export const nsfcStatstore = defineStore("nsfcStatsDemo", {
   state() {
     return {
@@ -84,3 +61,39 @@ export const homeStore = defineStore("home", {
     ],
   },
 });
+
+export const wmStatstore = defineStore("wmStatsDemo", {
+  state() {
+    return {
+      Subject: reactive([]),
+    };
+  },
+  persist: {
+    enabled: true,
+    strategies: [
+      {
+        key: "page",
+        storage: localStorage,
+      },
+    ],
+  },
+});
+
+export const dynamicStore = (name: string, defaultDict: any) => {
+  return defineStore(name, {
+    state() {
+      return {
+        states: reactive(defaultDict),
+      };
+    },
+    persist: {
+      enabled: true,
+      strategies: [
+        {
+          key: "page",
+          storage: localStorage,
+        },
+      ],
+    },
+  })();
+};

@@ -44,9 +44,9 @@ el-container
 
 <script lang="ts">
 export default {
-  name: "NFSC-stats-2022-07",
+  name: "NSFC-stats-2022-07",
   autoIndex: true,
-  text: "NFSC 数据统计",
+  text: "NSFC 数据统计",
   update: "2022-08-11T09:43:03.429Z",
 };
 </script>
@@ -59,7 +59,7 @@ import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 
 const appHomeStore = homeStore();
-appHomeStore.title = "NFSC 数据统计";
+appHomeStore.title = "NSFC 数据统计";
 
 const appStore = nsfcStatstore();
 
