@@ -2,9 +2,9 @@
 el-container
   el-main
     el-row
-      el-col(:span="12")
+      el-col(:span="18")
         el-form-item(label="学科选择:" size="large")
-          el-select(v-model="appStore.Subject",placeholder="学科选择",multiple,style="width: 100%",size='large',@change='updateChart')
+          el-select(v-model="appStore.states.SubjectSelect",placeholder="学科选择",multiple,style="width: 100%",size='large',@change='updateChart')
             el-option(v-for="item in allSubjects",:key="item",:label="item",:value="item")    
     el-row
       el-col(:span="24")
@@ -21,9 +21,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { homeStore, wmStatstore } from "@/pinia/modules/pageStore";
+import { homeStore, dynamicStore } from "@/pinia/modules/pageStore";
 import _ from "lodash";
-import { reactive, onMounted } from "vue";
+import { onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 import axios from "@/utils/requests";
@@ -31,7 +31,17 @@ import axios from "@/utils/requests";
 const appHomeStore = homeStore();
 appHomeStore.title = "WM 颠覆度学科逐年分布";
 
-const appStore = wmStatstore();
+const appStore = dynamicStore("wm-disruption", {
+  SubjectSelect: [
+    "WM",
+    "Chemistry",
+    "Mathematics",
+    "History",
+    "Geology",
+    "Algebra",
+    "Biology",
+  ],
+});
 
 const allSubjects = [
   "WM",
@@ -91,8 +101,6 @@ let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
   let response = await axios.get("static/data/wm/average-disrution.json");
-  // console.log(response.data);
-  // 生成一些数据
   let option = extendEchartsOpts({
     title: {
       left: "center",
@@ -104,36 +112,24 @@ const updateChart = _.debounce(async () => {
       text: "WM 颠覆度学科逐年分布",
     },
     xAxis: {
-      // max: 5,
-      type: "category",
+      name: "year",
+      type: "value",
+      max: 2020,
+      min: 1960,
     },
     legend: {
       show: true,
     },
     yAxis: [
       {
-        position: "left",
-        name: "数量",
-      },
-      {
-        name: "百万美元",
-        position: "right",
-      },
-      {
-        name: "Fund/GDP",
-        position: "right",
-        show: false,
+        // position: "left",
+        name: "disruption",
+        type: "value",
       },
     ],
     dataset: [
       {
         source: response.data,
-      },
-      {
-        transform: {
-          type: "filter",
-          config: { dimension: "Year", value: 2011 },
-        },
       },
     ],
     tooltip: {
@@ -163,19 +159,19 @@ const updateChart = _.debounce(async () => {
         return showHtm;
       },
     },
-    series: [
-      {
+    series: appStore.states.SubjectSelect.map((item: string) => {
+      return {
+        datasetIndex: 0,
         type: "line",
-        name: appStore.Subject[0],
-        // yAxisIndex: 1,
+        name: item,
         encode: {
           x: "year",
-          y: appStore.Subject[0],
+          y: item,
         },
-      },
-    ],
+      };
+    }),
   });
-  // console.log("set opion:", option);
+  console.log("set opion:", option);
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option);
 }, 1000);
