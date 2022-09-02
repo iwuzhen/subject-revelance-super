@@ -2,7 +2,11 @@
 el-container
   el-main
     el-row
-      el-col(:span="18")
+      el-col(:span="4")
+        el-form-item(label="图表选择:" size="large")
+          el-select(v-model="appStore.states.chartTypeSelect",placeholder="图表选择",style="width: 100%",size='large',@change='updateChart')
+            el-option(v-for="item in chartTypeOpt",:key="item.text",:label="item.text",:value="item.value")    
+      el-col(:span="18")  
         el-form-item(label="学科选择:" size="large")
           el-select(v-model="appStore.states.SubjectSelect",placeholder="学科选择",multiple,style="width: 100%",size='large',@change='updateChart')
             el-option(v-for="item in allSubjects",:key="item",:label="item",:value="item")    
@@ -15,7 +19,7 @@ el-container
 export default {
   name: "WM-disruption",
   autoIndex: true,
-  text: "WM disruption 逐年分布",
+  text: "WM disruption 逐年分布, 联通网络的学科文章数",
   update: "2022-09-01T09:43:03.429Z",
 };
 </script>
@@ -41,6 +45,7 @@ const appStore = dynamicStore("wm-disruption", {
     "Algebra",
     "Biology",
   ],
+  chartTypeSelect: 1,
 });
 
 const allSubjects = [
@@ -96,11 +101,25 @@ const allSubjects = [
   "Deep learning",
   "Genome editing",
 ];
+const chartTypeOpt = [
+  {
+    text: "颠覆度",
+    value: 0,
+  },
+  {
+    text: "联通的Paper数",
+    value: 1,
+  },
+];
 
 let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
-  let response = await axios.get("static/data/wm/average-disrution.json");
+  let url = "static/data/wm/connect-graph-subject-paper-count.json";
+  if (appStore.states.chartTypeSelect === 0) {
+    url = "static/data/wm/average-disrution.json";
+  }
+  let response = await axios.get(url);
   let option = extendEchartsOpts({
     title: {
       left: "center",
@@ -123,7 +142,7 @@ const updateChart = _.debounce(async () => {
     yAxis: [
       {
         // position: "left",
-        name: "disruption",
+        // name: "disruption",
         type: "value",
       },
     ],

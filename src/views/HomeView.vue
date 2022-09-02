@@ -6,7 +6,7 @@ el-container
         el-card
           template(#header)
             .card-header
-              span.text-2xl {{item.title}}
+              span.text-3xl {{item.title}}
           .description 
             p {{item.text}}
           .bottom
@@ -57,7 +57,8 @@ files.keys().map((item) => {
     color: #999;
   }
   .description {
-    font-size: 20px;
+    font-size: 16px;
+    width: 180px;
     align-items: left;
   }
   .bottom {
