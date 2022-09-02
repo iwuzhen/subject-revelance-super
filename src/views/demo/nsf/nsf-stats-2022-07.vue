@@ -19,13 +19,6 @@ el-container
             el-checkbox(v-model="appStore.states.ShowFund", size="large",  @change='updateChart')
           el-form-item(label="选项:" size="large")
             el-checkbox(v-model="appStore.states.FundMvCPI",size="large",label="CPI加权",:disabled="!appStore.states.ShowFund",  @change='updateChart')
-
-      el-col(:span="4")
-        el-form.radius(label-position="left")
-          el-form-item(label="NIH 资金数:" size="large")
-            el-checkbox(v-model="appStore.states.showNIH", size="large",  @change='updateChart')
-          el-form-item(label="NIH占GDP比例:" size="large")
-            el-checkbox(v-model="appStore.states.showNIHDivGDP", size="large",  @change='updateChart')
       el-col(:span="4")
         el-form.radius(label-position="left")
           el-form-item(label="项目数:" size="large")
@@ -34,6 +27,12 @@ el-container
         el-form.radius(label-position="left")
           el-form-item(label="资金GDP比例:" size="large")
             el-checkbox(v-model="appStore.states.ShowRatio", size="large",  @change='updateChart')
+      el-col(:span="4")
+        el-form.radius(label-position="left")
+          el-form-item(label="NIH 资金数:" size="large")
+            el-checkbox(v-model="appStore.states.showNIH", size="large",  @change='updateChart')
+          el-form-item(label="NIH占GDP比例:" size="large")
+            el-checkbox(v-model="appStore.states.showNIHDivGDP", size="large",  @change='updateChart')
           
     el-row
       el-col(:span="24")
