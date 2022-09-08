@@ -4,8 +4,8 @@ el-container
     el-row(v-if="editMode", justify="end")
       Transition(name="fade" mode="out-in")
         //- el-button(:type="viewStatus===false?'primary':'success'",@click="viewStatus=!viewStatus",style="margin-top: -40px;") {{viewStatus===false?'编辑Note':'展示Note'}}
-        el-button(type="primary",v-if="!viewStatus", @click="viewStatus=!viewStatus",style="margin-top: -40px;") 编辑Note
-        el-button(type="success",v-else,@click="viewStatus=!viewStatus",style="margin-top: -40px;") 展示Note
+        el-button(type="primary",v-if="!viewStatus", @click="viewStatus=!viewStatus",style="margin-top: -40px;") 编辑 Note
+        el-button(type="success",v-else,@click="viewStatus=!viewStatus",style="margin-top: -40px;") 展示 Note
     el-row(v-loading="loading")
       md-editor(v-model="text",v-if="viewStatus",:htmlPreview="false",:toolbarsExclude="toolbarsExclude",:onSave="saveNoteBook",editorId="edit",:previewOnly="!father.editMode")
       md-editor(v-model="text",v-else,:htmlPreview="false",editorId="view",:previewOnly="true")
@@ -25,7 +25,7 @@ import { apiSeveice } from "@/utils/requests";
 
 console.log(MdEditor.defToolbars);
 
-const toolbarsExclude = ["github", "htmlPreview", "fullscreen", "image"];
+const toolbarsExclude = ["github", "htmlPreview", "image"];
 
 const saveNoteBook = async (data: string) => {
   await apiSeveice.put(`v/1.0/fresh/notebok/${father.storagekey}`, {
