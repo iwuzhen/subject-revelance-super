@@ -1,6 +1,7 @@
 <template lang="pug">
 el-container
   el-main
+    NoteBook(storagekey="wikiIndexNote",:editMode="true")
     el-space(wrap)
       router-link(v-for="item in pageData" :to="item.href" target="_blank")
         el-card
@@ -15,6 +16,7 @@ el-container
 
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
+import NoteBook from "@/components/NoteBook.vue";
 import dayjs from "dayjs";
 const appHomeStore = homeStore();
 appHomeStore.title = "wiki";

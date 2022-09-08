@@ -63,7 +63,7 @@ import { reactive, onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 import { dataSetAddNewColume } from "@/utils/echartsTool";
-import axios from "@/utils/requests";
+import { localSeveice } from "@/utils/requests";
 
 const appHomeStore = homeStore();
 appHomeStore.title = "NSF 数据统计";
@@ -1940,7 +1940,9 @@ let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
   // 项目和资金数
-  let response = await axios.get("static/data/nsf/fund-and-project.json");
+  let response = await localSeveice.get(
+    "static/data/nsf/fund-and-project.json"
+  );
   let dataSet = response.data;
   dataSetAddNewColume(dataSet, "UfundM", (obj: any) => {
     return _.round((obj.fundM / obj.CPI) * 100, 1);
@@ -1956,7 +1958,7 @@ const updateChart = _.debounce(async () => {
   });
 
   // NIH 资金数
-  response = await axios.get("static/data/nih/appropriations.json");
+  response = await localSeveice.get("static/data/nih/appropriations.json");
   let dataSet_nih = response.data;
   dataSetAddNewColume(dataSet_nih, "TotalM", (obj: any) => {
     return obj.Total / 1000;
@@ -2119,7 +2121,9 @@ const updateChart = _.debounce(async () => {
 
 const updateNextChart = _.debounce(async () => {
   // NSF Directorate  资金分布
-  let response = await axios.get("static/data/nsf/directorate-fund.json");
+  let response = await localSeveice.get(
+    "static/data/nsf/directorate-fund.json"
+  );
   let dataSet1 = response.data;
   let dataSetArray = [
     dataSet1,

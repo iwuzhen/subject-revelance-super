@@ -14,6 +14,7 @@
     "echarts": "^5.3.3",
     "element-plus": "^2.2.8",
     "lodash": "^4.17.21",
+    "md-editor-v3": "^2.2.1",
     "pinia": "^2.0.14",
     "pinia-plugin-persist": "^1.0.0",
     "ts-deepmerge": "^2.0.4",

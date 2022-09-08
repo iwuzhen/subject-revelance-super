@@ -1,10 +1,17 @@
 import axios from "axios";
 
 // 创建axios实例
-const service = axios.create({
+const localSeveice = axios.create({
   timeout: 150000000, // 请求超时时间
 });
 
-service.defaults.baseURL = "/v2";
+localSeveice.defaults.baseURL = "/v2";
 
-export default service;
+// 创建axios实例
+const apiSeveice = axios.create({
+  timeout: 150000000, // 请求超时时间
+});
+
+apiSeveice.defaults.baseURL = "https://api.nikepai.com";
+
+export { localSeveice, apiSeveice };
