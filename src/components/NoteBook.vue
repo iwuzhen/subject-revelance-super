@@ -25,13 +25,7 @@ import { apiSeveice } from "@/utils/requests";
 
 console.log(MdEditor.defToolbars);
 
-const toolbarsExclude = [
-  "github",
-  "htmlPreview",
-  "pageFullscreen",
-  "fullscreen",
-  "image",
-];
+const toolbarsExclude = ["github", "htmlPreview", "fullscreen", "image"];
 
 const saveNoteBook = async (data: string) => {
   await apiSeveice.put(`v/1.0/fresh/notebok/${father.storagekey}`, {
