@@ -31,7 +31,10 @@ const saveNoteBook = async (data: string) => {
   await apiSeveice.put(`v/1.0/fresh/notebok/${father.storagekey}`, {
     data: data,
   });
-  ElMessage("保存成功");
+  ElMessage({
+    message: "保存成功",
+    type: "success",
+  });
 };
 
 const text = ref("");
