@@ -1,14 +1,18 @@
 <template lang="pug">
 el-container
   el-main
-    NoteBook(storagekey="wikiIndexNote",:editMode="true")
+    el-row
+      el-link(type="primary" href="/v1/") 
+        h2 v1 导航(方块导航)
+    el-row
+      NoteBook(storagekey="wikiIndexNote",:editMode="true")
 </template>
 
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
 import NoteBook from "@/components/NoteBook.vue";
 const appHomeStore = homeStore();
-appHomeStore.title = "Index";
+appHomeStore.title = "Grid Navigation";
 </script>
 
 <style lang="less">

@@ -6,7 +6,7 @@ el-container
         //- el-button(:type="viewStatus===false?'primary':'success'",@click="viewStatus=!viewStatus",style="margin-top: -40px;") {{viewStatus===false?'编辑Note':'展示Note'}}
         el-button(type="primary",v-if="!viewStatus", @click="viewStatus=!viewStatus",style="margin-top: -40px;") 编辑 Note
         el-button(type="success",v-else,@click="viewStatus=!viewStatus",style="margin-top: -40px;") 展示 Note
-    el-row(v-loading="loading")
+    el-row.md-editor(v-loading="loading")
       md-editor(v-model="text",v-if="viewStatus",:htmlPreview="false",:toolbarsExclude="toolbarsExclude",:onSave="saveNoteBook",editorId="edit",:previewOnly="!father.editMode")
       md-editor(v-model="text",v-else,:htmlPreview="false",editorId="view",:previewOnly="true")
 </template>
@@ -86,5 +86,9 @@ button {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-30px);
+}
+
+.md-editor {
+  text-align: left;
 }
 </style>
