@@ -1,7 +1,6 @@
 <template lang="pug">
 el-container
   el-main
-    NoteBook(storagekey="wikiIndexNote",:editMode="true")
     el-space(wrap)
       router-link(v-for="item in pageData" :to="item.href" target="_blank")
         el-card
@@ -31,7 +30,7 @@ let pageData = [
 ];
 pageData = [];
 
-const files = require.context("@/views", true, /\.vue$/);
+const files = require.context("@/views/demo", true, /\.vue$/);
 files.keys().map((item) => {
   const path = item.slice(1).replace(".vue", "").toLowerCase();
   // 获取组件信息
@@ -41,7 +40,7 @@ files.keys().map((item) => {
       title: comp.name,
       text: comp.text,
       update: comp.update,
-      href: path,
+      href: `/demo${path}`,
     });
   }
 });
