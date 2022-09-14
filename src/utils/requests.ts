@@ -39,7 +39,7 @@ export const getNote = async (key: string) => {
 export const setNote = async (key: string, id: string, data: string) => {
   const rep = await setfresh("notebok", key, id, data);
   if (rep.data.code === 200) {
-    return rep.data;
+    return rep.data.data;
   }
   throw Error(rep.data.message || rep.status);
 };

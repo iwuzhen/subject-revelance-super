@@ -29,6 +29,7 @@ let noteID = "";
 const saveNoteBook = async (data: string) => {
   try {
     const rep = await setNote(father.storagekey, noteID, data);
+    noteID = rep.data.id;
     ElMessage({
       message: "保存成功",
       type: "success",
