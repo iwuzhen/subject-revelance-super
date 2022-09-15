@@ -7,7 +7,7 @@ el-row
 
   el-col(:span="3")
     el-form-item(label="最小值过滤:" size="large")
-      el-input-number(v-model="appStore.states.yz" :step="2" :min="1",@change='updateChart')
+      el-input-number(v-model="appStore.states.yz" :step="1" :min="1",@change='updateChart')
 
   el-col(:span="10")
     el-form-item(label="选中的学科 :" size="large")
@@ -108,6 +108,7 @@ const updateChart = _.debounce(async () => {
       cats: appStore.states.subjectSelect
         .map((name: string) => name.toLowerCase())
         .join(","),
+      yz: appStore.states.yz,
     },
   });
   // build dataset
