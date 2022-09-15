@@ -15,7 +15,7 @@ el-row
         el-option(v-for="item in subjectOpt",:key="item",:label="item",:value="item")    
 
   el-col(:span="12")
-    el-tree(:props="props" lazy :load="loadNode" show-checkbox :check-strictly="true" @check-change="handleCheckChange")
+    el-tree(:props="props" lazy :load="loadNode" show-checkbox :check-strictly="true" @check-change="handleCheckChange",node-key="name",accordion,:default-checked-keys="appStore.states.subjectSelect")
       template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
         el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
