@@ -1,21 +1,25 @@
 <template lang="pug">
 el-row
-  el-col(:span="8")
+  el-col(:span="3")
+    el-form-item(label="type:" size="large")
+      el-select(v-model="appStore.states.typeSelect",placeholder="图表选择",style="width: 100%",size='large',@change='updateChart')
+        el-option(v-for="item in typeOpt",:key="item",:label="item",:value="item")
+
+  el-col(:span="3")
+    el-form-item(label="最小值过滤:" size="large")
+      el-input-number(v-model="appStore.states.yz" :step="2" :min="1",@change='updateChart')
+
+  el-col(:span="10")
+    el-form-item(label="选中的学科 :" size="large")
+      el-select(v-model="appStore.states.subjectSelect",allow-create,multiple,filterable,size='large',@change='updateChart')
+        el-option(v-for="item in subjectOpt",:key="item",:label="item",:value="item")    
+
+  el-col(:span="12")
     el-tree(:props="props" lazy :load="loadNode" show-checkbox :check-strictly="true" @check-change="handleCheckChange")
       template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
         el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
   
-  el-col(:span="10")
-    el-form-item(label="选中的学科 :" size="large")
-      el-select(v-model="appStore.states.subjectSelect",allow-create,multiple,default-first-option,filterable,size='large',@change='updateChart')
-        el-option(v-for="item in subjectOpt",:key="item",:label="item",:value="item")    
-
-  el-col(:span="4")
-    el-form-item(label="文章类型:" size="large")
-      el-select(v-model="appStore.states.typeSelect",placeholder="图表选择",style="width: 100%",size='large',@change='updateChart')
-        el-option(v-for="item in typeOpt",:key="item",:label="item",:value="item")    
-
 el-row
   el-col(:span="24")
     #echart1.echart
@@ -41,11 +45,12 @@ import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 
 const appHomeStore = homeStore();
-appHomeStore.title = "MAG FOS browser";
+appHomeStore.title = "MAG FOS trend";
 
 const appStore = dynamicStore("fos-trend-2022", {
   subjectSelect: ["Mathematics", "Physics"],
   typeSelect: "patent",
+  yz: 1,
 });
 
 interface Tree {
@@ -135,7 +140,7 @@ const updateChart = _.debounce(async () => {
       textStyle: {
         fontSize: 20,
       },
-      text: "WM 颠覆度学科逐年分布",
+      text: "MAG FOS trend",
     },
     xAxis: {
       name: "year",
