@@ -79,7 +79,6 @@ const props = {
 
 const subjectOpt: string[] = [];
 const typeOpt = ["book", "patent", "article"];
-// "type":"book"  //[book,patent,article]  book和patent数据好了 article数据没好
 
 let myChartObjs: echarts.ECharts[] = [];
 onMounted(() => {
@@ -114,12 +113,16 @@ const updateChart = _.debounce(async () => {
   // build dataset
   let dataObj = response.data.data;
   let dataset = [["year", ...Object.keys(dataObj)]];
+  let dataFlag = false;
   for (let year = 1800; year <= 2020; year++) {
     let row: any[] = [year];
     for (let key of dataset[0].slice(1)) {
       row.push(dataObj[key][year] || "-");
+      if (dataObj[key][year]) {
+        dataFlag = true;
+      }
     }
-    dataset.push(row);
+    if (dataFlag) dataset.push(row);
   }
   // console.log(dataset);
   // sort dataset title by last row value
@@ -147,7 +150,7 @@ const updateChart = _.debounce(async () => {
       name: "year",
       type: "value",
       max: 2020,
-      min: 1800,
+      min: "dataMin",
     },
     legend: {
       show: true,
@@ -155,7 +158,7 @@ const updateChart = _.debounce(async () => {
     yAxis: [
       {
         // position: "left",
-        // name: "disruption",
+        name: "paper count",
         type: "value",
       },
     ],
