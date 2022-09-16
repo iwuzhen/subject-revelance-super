@@ -85,7 +85,7 @@ appHomeStore.title = "MAG FOS trend";
 
 const appStore = dynamicStore("fos-trend-2022", {
   subjectSelect: ["Mathematics", "Physics"],
-  typeSelect: "patent",
+  typeSelect: "article",
   yz: 1,
 });
 
