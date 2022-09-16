@@ -312,28 +312,32 @@ const updateChart = _.debounce(async () => {
         return showHtm;
       },
     },
-    series: legend.map((item: any) => {
-      return {
-        datasetIndex: 0,
-        type: "line",
-        name: item,
-        markPoint: {
-          data: [
-            {
-              // type: "min",
-              name: "Min",
-              xAxis: fosFirstYear[item.toLowerCase()][0],
-              value: fosFirstYear[item.toLowerCase()][1],
-              yAxis: fosFirstYear[item.toLowerCase()][1],
-            },
-          ],
-        },
-        encode: {
-          x: "year",
-          y: item.toLowerCase(),
-        },
-      };
-    }),
+    series: legend
+      .filter((item: any) => {
+        return fosFirstYear[item.toLowerCase()]?.length > 0;
+      })
+      .map((item: any) => {
+        return {
+          datasetIndex: 0,
+          type: "line",
+          name: item,
+          markPoint: {
+            data: [
+              {
+                // type: "min",
+                name: "Min",
+                xAxis: fosFirstYear[item.toLowerCase()][0],
+                value: fosFirstYear[item.toLowerCase()][1],
+                yAxis: fosFirstYear[item.toLowerCase()][1],
+              },
+            ],
+          },
+          encode: {
+            x: "year",
+            y: item.toLowerCase(),
+          },
+        };
+      }),
   });
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option, true);

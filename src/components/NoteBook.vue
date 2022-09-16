@@ -19,11 +19,11 @@ export default {
 
 <script lang="ts" setup>
 import { ref, defineProps, onMounted, onUnmounted } from "vue";
-import MdEditor from "md-editor-v3";
+import MdEditor, { ToolbarNames } from "md-editor-v3";
 import { ElMessage } from "element-plus";
 import { getNote, setNote } from "@/utils/requests";
 
-const toolbarsExclude = ["github", "htmlPreview", "image"];
+const toolbarsExclude: ToolbarNames[] = ["github", "htmlPreview", "image"];
 let noteID = "";
 
 const saveNoteBook = async (data: string) => {

@@ -15,7 +15,6 @@ el-container
 
 <script setup lang="ts">
 import { homeStore } from "@/pinia/modules/pageStore";
-import NoteBook from "@/components/NoteBook.vue";
 import dayjs from "dayjs";
 const appHomeStore = homeStore();
 appHomeStore.title = "wiki";
