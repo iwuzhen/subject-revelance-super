@@ -15,7 +15,7 @@ files.keys().map((item) => {
   const path = item.slice(1).replace(".vue", "").toLowerCase();
   // 获取组件信息
   const comp = files(item).default;
-  console.log(comp);
+  // console.log(comp);
   routes.push({
     path,
     name: comp.name,

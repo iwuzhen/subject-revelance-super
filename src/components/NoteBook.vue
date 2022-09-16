@@ -29,6 +29,7 @@ let noteID = "";
 const saveNoteBook = async (data: string) => {
   try {
     const rep = await setNote(father.storagekey, noteID, data);
+    console.log(rep, "rep");
     noteID = rep.id;
     ElMessage({
       message: "保存成功",
@@ -89,8 +90,6 @@ const father = defineProps({
     default: true,
   },
 });
-
-// const text = ref("# Hello Editor " + father.storagekey);
 </script>
 
 <style lang="less">

@@ -32,7 +32,7 @@ el-row
 
   el-col(:span="10")
     el-form-item(label="选中的学科 :" size="large")
-      el-select(v-model="appStore.states.subjectSelect",allow-create,multiple,filterable,size='large',@change='updateChart')
+      el-select(v-model="appStore.states.subjectSelect",allow-create,multiple,filterable,size='large',@change='updateChart',clearable)
         el-option(v-for="item in subjectOpt",:key="item",:label="item",:value="item")    
 el-row
   el-col(:span="8") 
