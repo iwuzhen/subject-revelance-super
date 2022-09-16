@@ -7,9 +7,12 @@ el-dialog(v-model="dialogTableVisible" title="Paper information" width="90%")
           span.text-3xl {{item.title}}
           br
           span.zh {{ en2zhdict[item.title]===undefined?'Loading...': en2zhdict[item.title] }}
-      description(v-if="item.publisher !==''")
-        p publisher: {{item.publisher}}
+      el-row(v-if="item.publisher !==''")
+        div publisher: {{item.publisher}}
 
+      el-row(v-if="item.venue?.name !==''")
+        div venue: {{item.venue?.name}}
+  
       el-row
         .author( v-for="author in item.authors" :key="author.name" )
           .name {{author.name}}
@@ -19,6 +22,15 @@ el-dialog(v-model="dialogTableVisible" title="Paper information" width="90%")
 
       .tag
         el-tag( v-for="tag in item.fos"  :key="tag.name"  :disable-transitions="false" ) {{tag.name}}
+
+el-dialog(v-model="dialogTreeVisible" title="Tree Search" width="60%")
+  el-main
+    el-row
+      el-col(:span="20")
+        el-tree(:props="props" :data="treeData" show-checkbox :check-strictly="true" @check-change="handleCheckChange",node-key="name",:default-expanded-keys="defaultExpandedKeys",:default-checked-keys="appStore.states.subjectSelect")
+          template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
+            el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
+            el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
 
 el-row
   el-col(:span="6")
@@ -42,18 +54,17 @@ el-row
       clearable
       placeholder="Please input"
       @select="handleSelect")
-  el-col(:span="6")
-    el-switch(@change="reloadChange",v-model="queryFlag",size="large",active-text="子查询",inactive-text="父查询")
-  el-col(:span="4")
-    el-button(type="primary" @click="initSubject") 回到顶级学科
+  //- el-col(:span="6")
+  //-   el-switch(@change="reloadChange",v-model="queryFlag",size="large",active-text="子查询",inactive-text="父查询")
+  //- el-col(:span="4")
+  //-   el-button(type="primary" @click="initSubject") 回到顶级学科
 
 el-row
-  el-col(:span="12")
-    el-tree(v-if="treeFlag" :props="props" lazy :load="loadNode" show-checkbox :check-strictly="true" @check-change="handleCheckChange",node-key="name",accordion,:default-checked-keys="appStore.states.subjectSelect")
+  el-col(:span="24" v-if="treeFlag")
+    el-tree(v-if="lazyTreeView" :props="props" lazy :load="loadNode" show-checkbox :check-strictly="true" @check-change="handleCheckChange",node-key="name",accordion,:default-checked-keys="appStore.states.subjectSelect")
       template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
         el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
-  
 el-row
   el-alert(title="点击 chart 中的点可以查询其中的文章" type="info" ) 
   el-col(:span="24")
@@ -93,7 +104,7 @@ interface Tree {
   id?: number;
   name: string;
   size: number;
-  // children?: Tree[];
+  children?: Tree[] | undefined;
   leaf?: boolean;
 }
 
@@ -107,10 +118,13 @@ const GetFosByNamePath =
   "https://wiki.lmd.knogen.com:10443/api/mag/getFosByName";
 const queryFlag = ref(true);
 const dialogTableVisible = ref(false);
+const dialogTreeVisible = ref(false);
+
+const defaultExpandedKeys = ref<string[]>([]);
 
 const props = {
   label: "name",
-  children: "zones",
+  children: "children",
   isLeaf: "leaf",
 };
 interface LinkItem {
@@ -123,7 +137,10 @@ let queryObj = reactive({
 });
 
 const treeFlag = ref(true);
+const lazyTreeView = ref(true);
 const queryName = ref("");
+const treeData = ref<Tree[]>([]);
+
 const querySearchAsync = async (
   queryString: string,
   cb: (arg: any) => void
@@ -143,16 +160,22 @@ const querySearchAsync = async (
   });
   cb(results);
 };
-const handleSelect = (item: LinkItem) => {
+
+// 确定查询的内容
+const handleSelect = async (item: LinkItem) => {
   queryObj.value = item.id;
   queryObj.name = item.value;
-  reloadChange();
+  treeData.value = await iteratorToFather(item.id, item.value);
+  // lazyTreeView.value = false;
+  dialogTreeVisible.value = true;
+  // reloadChange();
 };
 
 const reloadChange = () => {
   treeFlag.value = false;
   setTimeout(() => {
     treeFlag.value = true;
+    lazyTreeView.value = true;
   }, 5);
 };
 
@@ -357,19 +380,99 @@ const handleCheckChange = (
   updateChart();
 };
 
+const iteratorToFather = async (id: number, name: string) => {
+  // treeLazy.value = false;
+  console.log("iteratorToFather", id, name);
+  // 这里，从下到上构建简单树。
+  addTranslateChan(name);
+  let response = await axios.request({
+    // url: queryFlag.value ? ChildCategoriesPath : ParentCategoriesPath,
+    url: ChildCategoriesPath,
+    method: "post",
+    data: {
+      id,
+    },
+  });
+  let children: Tree[] = response.data.data.map(
+    (item: { id: any; name: any; size: number }) => {
+      addTranslateChan(item.name);
+      return {
+        id: item.id,
+        name: item.name,
+        size: item.size,
+        leaf: item.size === 0 ? true : false,
+      };
+    }
+  );
+
+  // let root: Tree[] = [];
+  let leafQueue: Tree[] = [
+    {
+      id,
+      name,
+      size: children.length,
+      leaf: children.length === 0 ? true : false,
+      children: children,
+    },
+  ];
+  let flag = true;
+  let defaultExpandedKeysSet = new Set<string>([]);
+  let rootTree: Tree[] = [];
+  while (flag) {
+    flag = false;
+    let nodeMap = new Map<string, Tree>();
+    console.log("leafQueue", leafQueue);
+    for (let currentLeaf of leafQueue) {
+      let response = await axios.request({
+        url: ParentCategoriesPath,
+        method: "post",
+        data: {
+          id: currentLeaf?.id,
+        },
+      });
+      if (response.data.data.length === 0) {
+        rootTree.push(currentLeaf);
+      } else {
+        response.data.data.forEach(
+          (item: { id: number; name: string; size: number }) => {
+            addTranslateChan(item.name);
+            flag = true;
+            defaultExpandedKeysSet.add(item.name);
+            if (item.name in nodeMap) {
+              nodeMap[item.name].children?.push(currentLeaf);
+              console.log("children", nodeMap[item.name].children);
+              // leafQueue.push(nodeMap[item.name]);
+            } else {
+              let node = {
+                id: item.id,
+                name: item.name,
+                size: item.size,
+                children: currentLeaf ? [currentLeaf] : [],
+                leaf: item.size === 0 ? true : false,
+              };
+              leafQueue.push(node);
+              nodeMap[item.name] = node;
+            }
+          }
+        );
+      }
+    }
+    leafQueue = Array.from(nodeMap.values());
+  }
+  defaultExpandedKeys.value = Array.from(defaultExpandedKeysSet);
+  rootTree = _.uniqBy(rootTree, "name");
+  console.log("rootTree", rootTree);
+  return rootTree;
+};
+
 const loadNode = async (node: Node, resolve: (data: Tree[]) => void) => {
   if (node.level === 0) {
     let response;
     if (queryObj.value > 0) {
-      addTranslateChan(queryObj.name);
-      return resolve([
-        {
-          id: queryObj.value,
-          name: queryObj.name,
-          size: 0,
-          leaf: false,
-        },
-      ]);
+      // treeLazy.value = false;
+      // let leafQueue = await iteratorToFather(queryObj.value, queryObj.name);
+      // return resolve(leafQueue);
+      return resolve([]);
     } else {
       response = await axios.get(OriginCategoriesPath);
     }
@@ -387,7 +490,8 @@ const loadNode = async (node: Node, resolve: (data: Tree[]) => void) => {
     return resolve(root);
   } else if (node.level > 0) {
     let response = await axios.request({
-      url: queryFlag.value ? ChildCategoriesPath : ParentCategoriesPath,
+      // url: queryFlag.value ? ChildCategoriesPath : ParentCategoriesPath,
+      url: ChildCategoriesPath,
       method: "post",
       data: {
         id: node.data.id,
