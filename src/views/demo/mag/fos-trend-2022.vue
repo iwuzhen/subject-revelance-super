@@ -4,9 +4,15 @@ el-dialog(v-model="dialogTableVisible" title="Paper information" width="90%")
     el-card(v-for="item in paperItem" :to="item.href" target="_blank")
       template(#header)
         .card-header
-          span.text-3xl {{item.title}}
-          br
-          span.zh {{ en2zhdict[item.title]===undefined?'Loading...': en2zhdict[item.title] }}
+          el-row
+            el-col(:span="4")
+              el-tooltip(content="linksin" effect="light" placement="top")
+                el-tag(effect="dark" type="success") {{item.linksin}}
+            el-col(:span="18")
+              .text-3xl {{item.title}}
+          el-row
+            el-col(:span="24")
+              span.zh {{ en2zhdict[item.title]===undefined?'Loading...': en2zhdict[item.title] }}
       el-row(v-if="item.publisher !==''")
         div publisher: {{item.publisher}}
 
@@ -44,15 +50,25 @@ el-row
 
   el-col(:span="10")
     el-form-item(label="选中的学科 :" size="large")
-      el-select(v-model="appStore.states.subjectSelect",allow-create,multiple,filterable,size='large',@change='updateChart',clearable)
+      el-tag(
+        v-for="tag in appStore.states.subjectSelect"
+        :key="tag"
+        class="mx-1"
+        closable
+        :disable-transitions="false"
+        @close="handleClose(tag)"
+      )  {{ tag }}
+
+      //- el-select(v-model="appStore.states.subjectSelect",allow-create,multiple,filterable,size='large',@change='updateChart',clearable)
         el-option(v-for="item in subjectOpt",:key="item",:label="item",:value="item")    
+el-divider
 el-row
   el-col(:span="8") 
-    el-form-item(label="搜索:" size="large")
+    el-form-item(label="Tree搜索:" size="large")
       el-autocomplete(v-model="queryName"
       :fetch-suggestions="querySearchAsync"
       clearable
-      placeholder="Please input"
+      placeholder="Search"
       @select="handleSelect")
   //- el-col(:span="6")
   //-   el-switch(@change="reloadChange",v-model="queryFlag",size="large",active-text="子查询",inactive-text="父查询")
@@ -65,6 +81,16 @@ el-row
       template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
         el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
+el-divider
+el-row
+  el-col(:span="4") 快捷文章搜索
+  el-col(:span="6" v-if="treeFlag")
+    el-select(v-model="paperQuerySubject", placeholder="选择要查询的学科",clearable,style="width: 100%",size='large',@change='querySubjectChange')
+      el-option(v-for="item in appStore.states.subjectSelect",:key="item",:label="item",:value="item")
+  el-col(:span="6" v-if="treeFlag")
+    el-select(v-model="paperQueryYear", placeholder="选择学科年份",clearable,style="width: 100%",size='large',@change='queryYearChange')
+      el-option(v-for="item in paperQueryOpt",:key="item",:label="item",:value="item")
+
 el-row
   el-alert(title="点击 chart 中的点可以查询其中的文章" type="info" ) 
   el-col(:span="24")
@@ -93,12 +119,33 @@ import { ElMessage } from "element-plus";
 
 const appHomeStore = homeStore();
 appHomeStore.title = "MAG FOS trend";
+let dataset: any;
 
 const appStore = dynamicStore("fos-trend-2022", {
   subjectSelect: ["Mathematics", "Physics"],
   typeSelect: "article",
   yz: 1,
 });
+
+const paperQuerySubject = ref("");
+const paperQueryYear = ref<number>();
+const paperQueryOpt = ref<number[]>([]);
+const querySubjectChange = () => {
+  console.log(dataset);
+  paperQueryOpt.value = [];
+  paperQueryYear.value = undefined;
+  let i = dataset[0].indexOf(paperQuerySubject.value.toLowerCase());
+  if (i < 1) return;
+  for (let row of dataset.slice(1)) {
+    if (row[i] !== "-" && row[i] <= 500) {
+      paperQueryOpt.value.push(row[0]);
+    }
+  }
+};
+const queryYearChange = () => {
+  if (!paperQuerySubject.value || !paperQueryYear.value) return;
+  getPaperDetail(paperQuerySubject.value.toLowerCase(), paperQueryYear.value);
+};
 
 interface Tree {
   id?: number;
@@ -107,6 +154,21 @@ interface Tree {
   children?: Tree[] | undefined;
   leaf?: boolean;
 }
+
+// 查询mag论文的linksin
+// https://wiki.lmd.knogen.com:10443/api/mag/getLinksinByIds
+// {
+//     "ids":"2041523977,1994099903,118329571",//论文的id
+//     "type":"article" //[article,patent,book]
+// }
+
+const handleClose = (tag: string) => {
+  appStore.states.subjectSelect.splice(
+    appStore.states.subjectSelect.indexOf(tag),
+    1
+  );
+  updateChart();
+};
 
 const OriginCategoriesPath =
   "https://wiki.lmd.knogen.com:10443/api/mag/getOriginCategories";
@@ -223,7 +285,14 @@ onMounted(() => {
 //     "year":1851, //年份
 //     "type":"article" //[article,book,patent]
 // }
+// 查询mag论文的linksin
+// https://wiki.lmd.knogen.com:10443/api/mag/getLinksinByIds
+// {
+//     "ids":"2041523977,1994099903,118329571",//论文的id
+//     "type":"article" //[article,patent,book]
+// }
 let paperItem = ref<any[]>([]);
+// query form paper
 const getPaperDetail = async (name: string, year: number) => {
   let url = "https://wiki.lmd.knogen.com:10443/api/mag/getMagInfoByFos";
   let response = await axios.request({
@@ -235,12 +304,28 @@ const getPaperDetail = async (name: string, year: number) => {
       year: year,
     },
   });
-  paperItem.value = response.data.data;
+
   dialogTableVisible.value = true;
+  let IDS = [];
   for (let item of response.data.data) {
+    IDS.push(item.id);
     addTranslateChan(item.title);
   }
   console.log(response.data);
+  let linksinResponse = await axios.request({
+    url: "https://wiki.lmd.knogen.com:10443/api/mag/getLinksinByIds",
+    method: "post",
+    data: {
+      type: appStore.states.typeSelect,
+      ids: IDS.join(","),
+    },
+  });
+  console.log("linksinResponse", linksinResponse.data);
+  for (let item of response.data.data) {
+    item.linksin = linksinResponse.data.data[item.id];
+  }
+  console.log(response.data.data);
+  paperItem.value = response.data.data;
 };
 
 const updateChart = _.debounce(async () => {
@@ -259,7 +344,7 @@ const updateChart = _.debounce(async () => {
   });
   // build dataset
   let dataObj = response.data.data;
-  let dataset = [["year", ...Object.keys(dataObj)]];
+  dataset = [["year", ...Object.keys(dataObj)]];
   let dataFlag = false;
   let fosFirstYear = {};
   for (let year = 1800; year <= 2020; year++) {
@@ -536,6 +621,17 @@ const addTranslateChan = (rst: string) => {
 </script>
 
 <style lang="less" scoped>
+.card-header {
+  .el-row {
+    margin: 0;
+    .el-col {
+      margin: 0;
+      .el-tag {
+        margin: 0;
+      }
+    }
+  }
+}
 .el-select {
   width: 95%;
 }
@@ -567,5 +663,15 @@ const addTranslateChan = (rst: string) => {
       margin-left: 5px;
     }
   }
+}
+.el-popper.is-customized {
+  /* Set padding to ensure the height is 32px */
+  padding: 6px 12px;
+  background: linear-gradient(90deg, rgb(159, 229, 151), rgb(204, 229, 129));
+}
+
+.el-popper.is-customized .el-popper__arrow::before {
+  background: linear-gradient(45deg, #b2e68d, #bce689);
+  right: 0;
 }
 </style>
