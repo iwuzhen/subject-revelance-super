@@ -82,7 +82,7 @@ el-row
         el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
 el-divider
-el-row
+el-row(v-loading="paperLoading")
   el-col(:span="4") 快捷文章搜索
   el-col(:span="6" v-if="treeFlag")
     el-select(v-model="paperQuerySubject", placeholder="选择要查询的学科",clearable,style="width: 100%",size='large',@change='querySubjectChange')
@@ -120,6 +120,7 @@ import { ElMessage } from "element-plus";
 const appHomeStore = homeStore();
 appHomeStore.title = "MAG FOS trend";
 let dataset: any;
+const paperLoading = ref(false);
 
 const appStore = dynamicStore("fos-trend-2022", {
   subjectSelect: ["Mathematics", "Physics"],
@@ -304,8 +305,7 @@ const getPaperDetail = async (name: string, year: number) => {
       year: year,
     },
   });
-
-  dialogTableVisible.value = true;
+  paperLoading.value = true;
   let IDS = [];
   for (let item of response.data.data) {
     IDS.push(item.id);
@@ -326,6 +326,8 @@ const getPaperDetail = async (name: string, year: number) => {
   }
   console.log(response.data.data);
   paperItem.value = response.data.data;
+  paperLoading.value = false;
+  dialogTableVisible.value = true;
 };
 
 const updateChart = _.debounce(async () => {
