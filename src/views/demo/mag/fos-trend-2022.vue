@@ -4,8 +4,8 @@ el-dialog(v-model="dialogTableVisible" title="Paper information" width="90%")
     el-card(v-for="item in paperItem" :to="item.href" target="_blank")
       template(#header)
         .card-header
-          el-row
-            el-col(:span="4")
+          el-row(justify="space-between")
+            el-col(:span="1")
               el-tooltip(content="linksin" effect="light" placement="top")
                 el-tag(effect="dark" type="success") {{item.linksin}}
             el-col(:span="18")
@@ -295,6 +295,7 @@ onMounted(() => {
 let paperItem = ref<any[]>([]);
 // query form paper
 const getPaperDetail = async (name: string, year: number) => {
+  paperLoading.value = true;
   let url = "https://wiki.lmd.knogen.com:10443/api/mag/getMagInfoByFos";
   let response = await axios.request({
     url,
@@ -303,31 +304,19 @@ const getPaperDetail = async (name: string, year: number) => {
       type: appStore.states.typeSelect,
       cat: name,
       year: year,
+      isGetLinksin: 1,
+      paixu: 2,
     },
   });
-  paperLoading.value = true;
   let IDS = [];
   for (let item of response.data.data) {
     IDS.push(item.id);
     addTranslateChan(item.title);
   }
-  console.log(response.data);
-  let linksinResponse = await axios.request({
-    url: "https://wiki.lmd.knogen.com:10443/api/mag/getLinksinByIds",
-    method: "post",
-    data: {
-      type: appStore.states.typeSelect,
-      ids: IDS.join(","),
-    },
-  });
-  console.log("linksinResponse", linksinResponse.data);
-  for (let item of response.data.data) {
-    item.linksin = linksinResponse.data.data[item.id];
-  }
   console.log(response.data.data);
   paperItem.value = response.data.data;
-  paperLoading.value = false;
   dialogTableVisible.value = true;
+  paperLoading.value = false;
 };
 
 const updateChart = _.debounce(async () => {
