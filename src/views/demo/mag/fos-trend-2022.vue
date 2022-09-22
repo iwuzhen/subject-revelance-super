@@ -461,6 +461,16 @@ const iteratorToFather = async (id: number, name: string) => {
   console.log("iteratorToFather", id, name);
   // 这里，从下到上构建简单树。
   addTranslateChan(name);
+  let responseParent = await axios.request({
+    // url: queryFlag.value ? ChildCategoriesPath : ParentCategoriesPath,
+    url: "https://wiki.lmd.knogen.com:10443/api/mag/getParentTree",
+    method: "post",
+    data: {
+      id,
+      name,
+    },
+  });
+  console.log("responsetmp", responseParent);
   let response = await axios.request({
     // url: queryFlag.value ? ChildCategoriesPath : ParentCategoriesPath,
     url: ChildCategoriesPath,
@@ -480,64 +490,91 @@ const iteratorToFather = async (id: number, name: string) => {
       };
     }
   );
-
-  // let root: Tree[] = [];
-  let leafQueue: Tree[] = [
-    {
-      id,
-      name,
-      size: children.length,
-      leaf: children.length === 0 ? true : false,
-      children: children,
-    },
-  ];
-  let flag = true;
   let defaultExpandedKeysSet = new Set<string>([]);
-  let rootTree: Tree[] = [];
-  while (flag) {
-    flag = false;
-    let nodeMap = new Map<string, Tree>();
-    console.log("leafQueue", leafQueue);
-    for (let currentLeaf of leafQueue) {
-      let response = await axios.request({
-        url: ParentCategoriesPath,
-        method: "post",
-        data: {
-          id: currentLeaf?.id,
-        },
-      });
-      if (response.data.data.length === 0) {
-        rootTree.push(currentLeaf);
-      } else {
-        response.data.data.forEach(
-          (item: { id: number; name: string; size: number }) => {
-            addTranslateChan(item.name);
-            flag = true;
-            defaultExpandedKeysSet.add(item.name);
-            if (item.name in nodeMap) {
-              nodeMap[item.name].children?.push(currentLeaf);
-              console.log("children", nodeMap[item.name].children);
-              // leafQueue.push(nodeMap[item.name]);
-            } else {
-              let node = {
-                id: item.id,
-                name: item.name,
-                size: item.size,
-                children: currentLeaf ? [currentLeaf] : [],
-                leaf: item.size === 0 ? true : false,
-              };
-              leafQueue.push(node);
-              nodeMap[item.name] = node;
-            }
-          }
-        );
+  const deepTree = (nodes: any): Tree[] => {
+    let root: Tree[] = [];
+    for (let node of nodes) {
+      let childs: Tree[] = [];
+      if (node.childList) {
+        childs = deepTree(node.childList);
       }
+      addTranslateChan(node.displayName);
+      if (node.displayName === name) {
+        childs = children;
+      } else {
+        defaultExpandedKeysSet.add(node.displayName);
+      }
+      let leaf: Tree = {
+        id: node.fieldOfStudyId,
+        name: node.displayName,
+        size: node.size,
+        leaf: node.childList?.length === 0 ? true : false,
+        children: childs,
+      };
+      root.push(leaf);
     }
-    leafQueue = Array.from(nodeMap.values());
-  }
+    return root;
+  };
+
+  let rootTree = deepTree(responseParent.data.data);
   defaultExpandedKeys.value = Array.from(defaultExpandedKeysSet);
-  rootTree = _.uniqBy(rootTree, "name");
-  console.log("rootTree", rootTree);
+  // let root: Tree[] = [];
+  // let leafQueue: Tree[] = [
+  //   {
+  //     id,
+  //     name,
+  //     size: children.length,
+  //     leaf: children.length === 0 ? true : false,
+  //     children: children,
+  //   },
+  // ];
+  // let flag = true;
+  // let defaultExpandedKeysSet = new Set<string>([]);
+  // let rootTree: Tree[] = [];
+  // while (flag) {
+  //   flag = false;
+  //   let nodeMap = new Map<string, Tree>();
+  //   console.log("leafQueue", leafQueue);
+  //   for (let currentLeaf of leafQueue) {
+  //     let response = await axios.request({
+  //       url: ParentCategoriesPath,
+  //       method: "post",
+  //       data: {
+  //         id: currentLeaf?.id,
+  //       },
+  //     });
+  //     if (response.data.data.length === 0) {
+  //       rootTree.push(currentLeaf);
+  //     } else {
+  //       response.data.data.forEach(
+  //         (item: { id: number; name: string; size: number }) => {
+  //           addTranslateChan(item.name);
+  //           flag = true;
+  //           defaultExpandedKeysSet.add(item.name);
+  //           if (item.name in nodeMap) {
+  //             nodeMap[item.name].children?.push(currentLeaf);
+  //             console.log("children", nodeMap[item.name].children);
+  //             // leafQueue.push(nodeMap[item.name]);
+  //           } else {
+  //             let node = {
+  //               id: item.id,
+  //               name: item.name,
+  //               size: item.size,
+  //               children: currentLeaf ? [currentLeaf] : [],
+  //               leaf: item.size === 0 ? true : false,
+  //             };
+  //             leafQueue.push(node);
+  //             nodeMap[item.name] = node;
+  //           }
+  //         }
+  //       );
+  //     }
+  //   }
+  //   leafQueue = Array.from(nodeMap.values());
+  // }
+  // defaultExpandedKeys.value = Array.from(defaultExpandedKeysSet);
+  // rootTree = _.uniqBy(rootTree, "name");
+  // console.log("rootTree", rootTree);
   return rootTree;
 };
 
