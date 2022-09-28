@@ -21,7 +21,7 @@ el-row
 <script lang="ts">
 export default {
   name: "MAG-fos-2022",
-  autoIndex: true,
+  autoIndex: false,
   text: "FOS 层级搜索引擎",
   update: "2022-07-21T09:43:03.429Z",
 };
