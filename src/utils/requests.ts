@@ -10,7 +10,7 @@ localSeveice.defaults.baseURL = "/v2";
 export const apiSeveice = axios.create({
   timeout: 120 * 1000,
 });
-apiSeveice.defaults.baseURL = "https://api.nikepai.com";
+apiSeveice.defaults.baseURL = "https://api.nikepai.com:10444";
 
 export const getfresh = async (path: string, key: string) => {
   return await apiSeveice.get(`v/1.0/fresh/${path}/${key}`);

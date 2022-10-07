@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const url = "https://api.nikepai.com/v/1.0/translate/zh";
+const url = "https://api.nikepai.com:10444/v/1.0/translate/zh";
 
 export async function getTranslate(params: string[]) {
   const ret = await axios.request({
