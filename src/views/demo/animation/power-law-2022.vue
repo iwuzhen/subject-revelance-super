@@ -35,7 +35,7 @@ import { reactive, onMounted, ref } from "vue";
 import axios from "axios";
 import * as echarts from "echarts";
 
-const url = "https://wiki.lmd.knogen.com:10443/api/wiki/getDfb_newDB";
+const url = "https://wiki.nikepai.com:10444/api/wiki/getDfb_newDB";
 let loading = ref(false);
 const option = {
   y_to: 0.1,

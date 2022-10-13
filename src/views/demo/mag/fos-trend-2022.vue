@@ -157,7 +157,7 @@ interface Tree {
 }
 
 // 查询mag论文的linksin
-// https://wiki.lmd.knogen.com:10443/api/mag/getLinksinByIds
+// https://wiki.nikepai.com:10444/api/mag/getLinksinByIds
 // {
 //     "ids":"2041523977,1994099903,118329571",//论文的id
 //     "type":"article" //[article,patent,book]
@@ -172,13 +172,12 @@ const handleClose = (tag: string) => {
 };
 
 const OriginCategoriesPath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getOriginCategories";
+  "https://wiki.nikepai.com:10444/api/mag/getOriginCategories";
 const ChildCategoriesPath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getChildCategories";
+  "https://wiki.nikepai.com:10444/api/mag/getChildCategories";
 const ParentCategoriesPath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getParentCategories";
-const GetFosByNamePath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getFosByName";
+  "https://wiki.nikepai.com:10444/api/mag/getParentCategories";
+const GetFosByNamePath = "https://wiki.nikepai.com:10444/api/mag/getFosByName";
 const queryFlag = ref(true);
 const dialogTableVisible = ref(false);
 const dialogTreeVisible = ref(false);
@@ -280,14 +279,14 @@ onMounted(() => {
 });
 
 // FOS某各类在year中发表的论文列表
-// https://wiki.lmd.knogen.com:10443/api/mag/getMagInfoByFos
+// https://wiki.nikepai.com:10444/api/mag/getMagInfoByFos
 // {
 //     "cat":"mechanics",//单选
 //     "year":1851, //年份
 //     "type":"article" //[article,book,patent]
 // }
 // 查询mag论文的linksin
-// https://wiki.lmd.knogen.com:10443/api/mag/getLinksinByIds
+// https://wiki.nikepai.com:10444/api/mag/getLinksinByIds
 // {
 //     "ids":"2041523977,1994099903,118329571",//论文的id
 //     "type":"article" //[article,patent,book]
@@ -296,7 +295,7 @@ let paperItem = ref<any[]>([]);
 // query form paper
 const getPaperDetail = async (name: string, year: number) => {
   paperLoading.value = true;
-  let url = "https://wiki.lmd.knogen.com:10443/api/mag/getMagInfoByFos";
+  let url = "https://wiki.nikepai.com:10444/api/mag/getMagInfoByFos";
   let response = await axios.request({
     url,
     method: "post",
@@ -320,7 +319,7 @@ const getPaperDetail = async (name: string, year: number) => {
 };
 
 const updateChart = _.debounce(async () => {
-  let url = "https://wiki.lmd.knogen.com:10443/api/mag/getFosCountByYear";
+  let url = "https://wiki.nikepai.com:10444/api/mag/getFosCountByYear";
 
   let response = await axios.request({
     url,
@@ -463,7 +462,7 @@ const iteratorToFather = async (id: number, name: string) => {
   addTranslateChan(name);
   let responseParent = await axios.request({
     // url: queryFlag.value ? ChildCategoriesPath : ParentCategoriesPath,
-    url: "https://wiki.lmd.knogen.com:10443/api/mag/getParentTree",
+    url: "https://wiki.nikepai.com:10444/api/mag/getParentTree",
     method: "post",
     data: {
       id,

@@ -51,13 +51,12 @@ interface LinkItem {
 }
 
 const OriginCategoriesPath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getOriginCategories";
+  "https://wiki.nikepai.com:10444/api/mag/getOriginCategories";
 const ChildCategoriesPath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getChildCategories";
+  "https://wiki.nikepai.com:10444/api/mag/getChildCategories";
 const ParentCategoriesPath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getParentCategories";
-const GetFosByNamePath =
-  "https://wiki.lmd.knogen.com:10443/api/mag/getFosByName";
+  "https://wiki.nikepai.com:10444/api/mag/getParentCategories";
+const GetFosByNamePath = "https://wiki.nikepai.com:10444/api/mag/getFosByName";
 const queryFlag = ref(true);
 const treeFlag = ref(true);
 const queryName = ref("");
