@@ -24,7 +24,8 @@ el-row
       template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
         el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
         el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
-
+el-row 
+  NoteBook(storagekey="openalex_concept_Tree",:editMode="true")
 </template>
 
 <script lang="ts">
@@ -42,9 +43,8 @@ import axios from "axios";
 import { getTranslate } from "@/utils/translate";
 import { reactive, ref, onMounted } from "vue";
 import _ from "lodash";
+import NoteBook from "@/components/NoteBook.vue";
 import type Node from "element-plus/es/components/tree/src/model/node";
-import * as echarts from "echarts";
-import { extendEchartsOpts } from "@/utils/model";
 import { ElMessage } from "element-plus";
 
 const appHomeStore = homeStore();
@@ -65,12 +65,16 @@ const apiSeveice = axios.create({
   timeout: 120 * 1000,
 });
 apiSeveice.defaults.baseURL = "https://wiki.nikepai.com:10444/es/v1";
-// apiSeveice.defaults.baseURL = "http://192.168.1.229:9201";
 
 // 获得一级类的数量
 const getOpenAlexTopCencepts = async () => {
   let query = {
-    _source: ["display_name", "id", "level"],
+    _source: [
+      "display_name",
+      "id",
+      "level",
+      "international.display_name.zh-hans",
+    ],
     size: 100,
     query: {
       match_phrase: {
@@ -82,7 +86,13 @@ const getOpenAlexTopCencepts = async () => {
     "concepts/_search?filter_path=hits.hits._source",
     query
   );
-  let ret = reponse.data.hits.hits.map((item: any) => item._source);
+  let ret = reponse.data.hits.hits.map((item: any) => {
+    if (item._source?.international?.display_name["zh-hans"] != undefined) {
+      en2zhdict[item._source.display_name] =
+        item._source?.international?.display_name["zh-hans"];
+    }
+    return item._source;
+  });
   return await promisAllChildCount(ret);
 };
 
@@ -114,14 +124,22 @@ const getOpenAlexCenceptChildCount = async (
   return reponse.data;
 };
 
-// 批量获取子类
+// 批量获取子类的子类个数
 const promisAllChildCount = async (nodes: any) => {
   let ps = [];
   for (let node of nodes) {
-    console.log(node);
-    let ret = await getOpenAlexCenceptChildCount(node.id, node.level);
-    node.size = ret.count;
+    let p = new Promise((resolve, reject) => {
+      getOpenAlexCenceptChildCount(node.id, node.level).then((res) => {
+        resolve(res);
+      });
+    });
+    ps.push(p);
   }
+  await Promise.all(ps).then((res) => {
+    for (let i in nodes) {
+      nodes[i].size = res[i]?.count;
+    }
+  });
   return nodes;
 };
 
@@ -131,7 +149,12 @@ const getOpenAlexCenceptChildNode = async (
   level: number
 ) => {
   let query = {
-    _source: ["display_name", "id", "level"],
+    _source: [
+      "display_name",
+      "id",
+      "level",
+      "international.display_name.zh-hans",
+    ],
     size: 5000,
     query: {
       bool: {
@@ -155,7 +178,13 @@ const getOpenAlexCenceptChildNode = async (
     query
   );
   // return reponse.data.hits.hits.map((item: any) => item._source);
-  let ret = reponse.data.hits.hits.map((item: any) => item._source);
+  let ret = reponse.data.hits.hits.map((item: any) => {
+    if (item._source?.international?.display_name["zh-hans"] != undefined) {
+      en2zhdict[item._source.display_name] =
+        item._source?.international?.display_name["zh-hans"];
+    }
+    return item._source;
+  });
   return await promisAllChildCount(ret);
 };
 
@@ -187,7 +216,13 @@ const searchOpenAlexCencepts = async (keywork: string) => {
 // 获得子类,包含 anceptor 的部分
 const getOpenAlexCenceptAncestors = async (cenceptId: string) => {
   let query = {
-    _source: ["display_name", "id", "level", "ancestors"],
+    _source: [
+      "display_name",
+      "id",
+      "level",
+      "ancestors",
+      "international.display_name.zh-hans",
+    ],
     query: {
       match_phrase: {
         id: cenceptId,
@@ -196,6 +231,14 @@ const getOpenAlexCenceptAncestors = async (cenceptId: string) => {
   };
 
   let reponse = await apiSeveice.post("concepts/_search", query);
+
+  reponse.data.hits.hits.map((item: any) => {
+    if (item._source?.international?.display_name["zh-hans"] != undefined) {
+      en2zhdict[item._source.display_name] =
+        item._source?.international?.display_name["zh-hans"];
+    }
+  });
+
   return reponse.data.hits.hits[0]._source.ancestors;
 };
 
@@ -301,7 +344,6 @@ const iteratorToFather = async (id: string, name: string, level: number) => {
   for (let i = level - 1; i > -1; i--) {
     console.log("root", i, root);
     if (anceptorMap[i].length === 1) {
-      console.log(1);
       let node = {
         id: anceptorMap[i][0].id,
         sid: anceptorMap[i][0].id,
@@ -313,7 +355,6 @@ const iteratorToFather = async (id: string, name: string, level: number) => {
       };
       root = await promisAllChildCount([node]);
     } else if (root.length === 1) {
-      console.log(2);
       let tmp_nodes = [];
       for (let subNode of anceptorMap[i]) {
         let node = {
@@ -330,7 +371,6 @@ const iteratorToFather = async (id: string, name: string, level: number) => {
       root = await promisAllChildCount(tmp_nodes);
     } else {
       // 各自找 true parete
-      console.log(3);
       let tmp_nodes_map = {};
       for (let subNode of root) {
         let ancestors = await getOpenAlexCenceptAncestors(subNode.id);
