@@ -100,7 +100,7 @@ el-row
 <script lang="ts">
 export default {
   name: "fos-trend-2022",
-  autoIndex: false,
+  autoIndex: true,
   text: "FOS 数量分布",
   update: "2022-09-15T01:01:01.429Z",
 };
