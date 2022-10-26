@@ -326,6 +326,9 @@ const updateWorkCountChart = _.debounce(async () => {
           x: "year",
           y: item,
         },
+        markPoint: {
+          data: [{ type: "max", name: "Max" }],
+        },
       };
     }),
   });
