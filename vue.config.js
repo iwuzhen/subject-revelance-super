@@ -67,4 +67,44 @@ module.exports = defineConfig({
     //视为一个外部库，而不将它打包进来
     config.externals(externals);
   },
+  devServer: {
+    // port: 8081,
+    proxy: {
+      "/api/": {
+        target: "https://wiki.lmd.knogen.com:10443/api/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/api": "/",
+        },
+      },
+      "/wapi/": {
+        target: "https://wiki.lmd.knogen.com:10443/wapi/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/wapi": "/",
+        },
+      },
+      "/goapi/": {
+        target: "https://wiki.lmd.knogen.com:10443/goapi/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/goapi": "/",
+        },
+      },
+      "/apigo/": {
+        target: "https://wiki.lmd.knogen.com:10443/apigo/",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/apigo": "/",
+        },
+      },
+      "/pyapi/v1": {
+        target: "https://wiki.nikepai.com/pyapi/v1",
+        changeOrigin: true,
+        pathRewrite: {
+          "^/pyapi/v1": "/",
+        },
+      },
+    },
+  },
 });

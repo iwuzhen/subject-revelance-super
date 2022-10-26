@@ -43,3 +43,9 @@ export const setNote = async (key: string, id: string, data: string) => {
   }
   throw Error(rep.data.message || rep.status);
 };
+
+// 创建 fastapi axios实例
+export const pyApiSeveice = axios.create({
+  timeout: 120 * 1000,
+});
+pyApiSeveice.defaults.baseURL = "/pyapi/v1";
