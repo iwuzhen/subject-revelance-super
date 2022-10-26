@@ -5,7 +5,7 @@ el-container
       el-col(:span="4")
         el-form-item(label="国家A:" size="large")
           el-select(v-model="appStore.states.CountryA",placeholder="国家A",style="width: 100%",size='large',@change='updateChart')
-            el-option(v-for="item in CountryCodes",:key="item.text",:label="item.text",:value="item.value")    
+            el-option(v-for="item in CountryCodes",:key="item",:label="item",:value="item")    
       el-col(:span="18")  
         el-form-item(label="国家选择:" size="large")
           el-select(v-model="appStore.states.CountryB",placeholder="国家选择",multiple,style="width: 100%",size='large',@change='updateChart')
