@@ -10,6 +10,7 @@ const cdn = {
     "https://cdn.staticfile.org/element-plus/2.2.8/index.min.css",
     "https://cdn.staticfile.org/font-awesome/6.1.1/css/all.css",
     "https://www.unpkg.com/md-editor-v3@2.2.1/lib/style.css",
+    "https://cdn.staticfile.org/flag-icon-css/6.6.6/css/flag-icons.min.css",
   ],
   js: [
     // 'https://cdn.staticfile.org/core-js/3.23.2/minified.min.js',

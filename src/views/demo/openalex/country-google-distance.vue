@@ -5,11 +5,17 @@ el-container
       el-col(:span="4")
         el-form-item(label="国家A:" size="large")
           el-select(v-model="appStore.states.CountryA",placeholder="国家A",style="width: 100%",size='large',@change='updateChart')
-            el-option(v-for="item in CountryCodes",:key="item",:label="item",:value="item")    
+            template(v-slot:prefix)
+              span(:class="`fi fi-${appStore.states.CountryA.toLowerCase()}`")
+            el-option(v-for="item in CountryCodes",:key="item",:label="item",:value="item")
+              span(style="float: left;line-height: inherit;"  :class="`fi fi-${item.toLowerCase()}`") 
+              span(style="float: right;")  {{ item }}
       el-col(:span="18")  
         el-form-item(label="国家选择:" size="large")
           el-select(v-model="appStore.states.CountryB",placeholder="国家选择",multiple,style="width: 100%",size='large',@change='updateChart')
             el-option(v-for="item in CountryCodes",:key="item",:label="item",:value="item")    
+              span(style="float: left;line-height: inherit;"  :class="`fi fi-${item.toLowerCase()}`")
+              span(style="margin-left:10px;")   {{ item }}
     el-row
       el-col(:span="24")
         #echart1.echart
@@ -174,13 +180,11 @@ const updateChart = _.debounce(async () => {
       textStyle: {
         fontSize: 20,
       },
-      text: "openalex country google distance",
+      text: "country google distance",
     },
     xAxis: {
       name: "year",
-      type: "value",
-      max: 2023,
-      min: 1920,
+      type: "category",
     },
     legend: {
       show: true,
@@ -190,7 +194,7 @@ const updateChart = _.debounce(async () => {
         // position: "left",
         // name: "disruption",
         type: "value",
-        min: 0.5,
+        min: "dataMin",
       },
     ],
     dataset: [
@@ -264,13 +268,11 @@ const updateWorkCountChart = _.debounce(async () => {
       textStyle: {
         fontSize: 20,
       },
-      text: "openalex country works count",
+      text: "country works count",
     },
     xAxis: {
       name: "year",
-      type: "value",
-      max: 2023,
-      min: 1920,
+      type: "category",
     },
     legend: {
       show: true,
@@ -310,7 +312,7 @@ const updateWorkCountChart = _.debounce(async () => {
           if (_text.includes("占比")) {
             _data = _.round(_data * 100, 4) + "%";
           }
-          showHtm += `${_marker}${_text}：${_data}<br>`;
+          showHtm += `${_marker}${_text}  ：${_data}<br>`;
         }
         return showHtm;
       },
