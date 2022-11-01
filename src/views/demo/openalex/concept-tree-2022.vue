@@ -1,31 +1,31 @@
 <template lang="pug">
+el-main
+  el-dialog(v-model="dialogTreeVisible" title="Tree Search" width="60%")
+    el-main
+      el-row
+        el-col(:span="20")
+          el-tree(:props="props" :data="treeData" show-checkbox :check-strictly="true",node-key="name",:default-expanded-keys="defaultExpandedKeys")
+            template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
+              el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
+              el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
 
-el-dialog(v-model="dialogTreeVisible" title="Tree Search" width="60%")
-  el-main
-    el-row
-      el-col(:span="20")
-        el-tree(:props="props" :data="treeData" show-checkbox :check-strictly="true",node-key="name",:default-expanded-keys="defaultExpandedKeys")
-          template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
-            el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
-            el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
+  el-row
+    el-col(:span="8") 
+      el-form-item(label="Tree搜索:" size="large")
+        el-autocomplete(v-model="queryName"
+        :fetch-suggestions="querySearchAsync"
+        clearable
+        placeholder="Search"
+        @select="handleSelect")
 
-el-row
-  el-col(:span="8") 
-    el-form-item(label="Tree搜索:" size="large")
-      el-autocomplete(v-model="queryName"
-      :fetch-suggestions="querySearchAsync"
-      clearable
-      placeholder="Search"
-      @select="handleSelect")
-
-el-row
-  el-col(:span="24" v-if="treeFlag")
-    el-tree(v-if="lazyTreeView" :props="props" lazy :load="loadNode" show-checkbox :check-strictly="true",node-key="name",accordion,)
-      template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
-        el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
-        el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
-el-row 
-  NoteBook(storagekey="openalex_concept_Tree",:editMode="true")
+  el-row
+    el-col(:span="24" v-if="treeFlag")
+      el-tree(v-if="lazyTreeView" :props="props" lazy :load="loadNode" show-checkbox :check-strictly="true",node-key="name",accordion,)
+        template.custom-tree-node(v-slot:="{ node }") {{ node.data.name }}
+          el-tag(class="ml-2") {{ en2zhdict[node.data.name]===undefined?'Loading...': en2zhdict[node.data.name] }}
+          el-tag(class="ml-2" type="success" v-if="node.data.size>0") {{node.data.size}}
+  el-row 
+    NoteBook(storagekey="openalex_concept_Tree",:editMode="true")
 </template>
 
 <script lang="ts">
