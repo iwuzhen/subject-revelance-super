@@ -94,7 +94,7 @@ const updateChart = _.debounce(async () => {
   );
   console.log(reponse.data);
 
-  let series: echarts.SeriesOption[] = _.zip(
+  let series: echarts.SeriesOption[] = _.zip<any, any>(
     reponse.data.data.legend,
     reponse.data.data.y
   ).map((item) => {
