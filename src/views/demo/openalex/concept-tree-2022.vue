@@ -64,7 +64,7 @@ interface Tree {
 const apiSeveice = axios.create({
   timeout: 120 * 1000,
 });
-apiSeveice.defaults.baseURL = "https://wiki.nikepai.com:10444/es/v1";
+apiSeveice.defaults.baseURL = "https://wiki.nikepai.com/es/v1";
 
 // 获得一级类的数量
 const getOpenAlexTopCencepts = async () => {

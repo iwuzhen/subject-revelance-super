@@ -79,7 +79,7 @@ let myChartObjs: echarts.ECharts[] = [];
 const apiSeveice = axios.create({
   timeout: 120 * 1000,
 });
-apiSeveice.defaults.baseURL = "https://wiki.nikepai.com:10444/";
+apiSeveice.defaults.baseURL = "https://wiki.nikepai.com/";
 
 const updateChart = _.debounce(async () => {
   // 生成一些数据
