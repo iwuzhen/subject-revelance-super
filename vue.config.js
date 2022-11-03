@@ -9,7 +9,7 @@ const cdn = {
     "https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/normalize/8.0.1/normalize.min.css",
     "https://cdn.staticfile.org/element-plus/2.2.8/index.min.css",
     "https://cdn.staticfile.org/font-awesome/6.1.1/css/all.css",
-    "https://www.unpkg.com/md-editor-v3@2.2.1/lib/style.css",
+    "https://www.unpkg.com/md-editor-v3@2.3.0/lib/style.css",
     "https://cdn.staticfile.org/flag-icon-css/6.6.6/css/flag-icons.min.css",
   ],
   js: [
@@ -24,7 +24,7 @@ const cdn = {
     "https://cdn.staticfile.org/dayjs/1.11.4/dayjs.min.js",
     "https://cdn.staticfile.org/dayjs/1.11.4/locale/zh-cn.min.js",
     "https://cdn.staticfile.org/dayjs/1.11.4/plugin/relativeTime.min.js",
-    "https://www.unpkg.com/md-editor-v3@2.2.1/lib/md-editor-v3.umd.js",
+    "https://www.unpkg.com/md-editor-v3@2.3.0/lib/md-editor-v3.umd.js",
   ],
 };
 
