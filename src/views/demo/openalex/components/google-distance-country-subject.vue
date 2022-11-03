@@ -63,8 +63,9 @@ const subjectOpt = [
   { id: 71924100, name: "Medicine" },
   { id: 86803240, name: "Biology" },
   { id: 162324750, name: "Economics" },
-];
+].sort((a: any, b: any) => a.name.localeCompare(b.name));
 
+console.log(subjectOpt);
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex country google distance";
 const appStore = dynamicStore("openalex-country-subject-distance", {
