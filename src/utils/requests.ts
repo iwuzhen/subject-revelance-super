@@ -1,19 +1,19 @@
 import axios from "axios";
 
 // 创建axios实例
-export const localSeveice = axios.create({
+export const localService = axios.create({
   timeout: 120 * 1000,
 });
-localSeveice.defaults.baseURL = "/v2";
+localService.defaults.baseURL = "/v2";
 
 // 创建axios实例
-export const apiSeveice = axios.create({
+export const apiService = axios.create({
   timeout: 120 * 1000,
 });
-apiSeveice.defaults.baseURL = "https://api.nikepai.com:10444";
+apiService.defaults.baseURL = "https://api.nikepai.com:10444";
 
 export const getfresh = async (path: string, key: string) => {
-  return await apiSeveice.get(`v/1.0/fresh/${path}/${key}`);
+  return await apiService.get(`v/1.0/fresh/${path}/${key}`);
 };
 
 export const setfresh = async (
@@ -22,7 +22,7 @@ export const setfresh = async (
   id: string,
   data: string
 ) => {
-  return apiSeveice.post(`v/1.0/fresh/${path}/${key}`, {
+  return apiService.post(`v/1.0/fresh/${path}/${key}`, {
     id,
     data: data,
   });
@@ -45,7 +45,7 @@ export const setNote = async (key: string, id: string, data: string) => {
 };
 
 // 创建 fastapi axios实例
-export const pyApiSeveice = axios.create({
+export const pyApiService = axios.create({
   timeout: 120 * 1000,
 });
-pyApiSeveice.defaults.baseURL = "/pyapi/v1";
+pyApiService.defaults.baseURL = "/pyapi/v1";

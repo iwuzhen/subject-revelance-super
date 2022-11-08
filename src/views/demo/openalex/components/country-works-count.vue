@@ -34,8 +34,8 @@ import _ from "lodash";
 import { onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
-import { pyApiSeveice } from "@/utils/requests";
-import CountrySelect from "./ConutrySelect.vue";
+import { pyApiService as pyApiService } from "@/utils/requests";
+import CountrySelect from "./CountrySelect.vue";
 
 const WorksTypes = [
   "UNKNOW",
@@ -85,7 +85,7 @@ const appStore = dynamicStore("openalex-country-distance", {
     "KR",
     "RU",
     "NL",
-    "ID",
+    "IL",
   ],
   CountainUnknow: true,
   WorkTypeSelect: [
@@ -113,12 +113,12 @@ const appStore = dynamicStore("openalex-country-distance", {
 let myChartObjs: echarts.ECharts[] = [];
 
 const updateWorkCountChart = _.debounce(async () => {
-  let countrys: any[] = [].concat([], appStore.states.CountryB);
+  let countries: any[] = [].concat([], appStore.states.CountryB);
   if (appStore.states.CountainUnknow) {
-    countrys.push("UNKNOW");
+    countries.push("UNKNOW");
   }
-  let response = await pyApiSeveice.post("/openalex/countryworkscount", {
-    countrys,
+  let response = await pyApiService.post("/openalex/countryworkscount", {
+    countries,
     typenames: appStore.states.WorkTypeSelect,
   });
   console.log("response.data", response.data);

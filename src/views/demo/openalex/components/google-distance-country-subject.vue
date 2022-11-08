@@ -40,8 +40,8 @@ import _ from "lodash";
 import { onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
-import { pyApiSeveice } from "@/utils/requests";
-import CountrySelect from "./ConutrySelect.vue";
+import { pyApiService } from "@/utils/requests";
+import CountrySelect from "./CountrySelect.vue";
 
 const subjectOpt = [
   { id: 205649164, name: "Geography" },
@@ -85,7 +85,7 @@ const appStore = dynamicStore("openalex-country-subject-distance", {
     "KR",
     "RU",
     "NL",
-    "ID",
+    "IL",
   ],
   SubjectA: 33923547,
   SubjectB: 33923547,
@@ -114,7 +114,7 @@ const appStore = dynamicStore("openalex-country-subject-distance", {
 });
 let myChartObjs: echarts.ECharts[] = [];
 const updateChart = _.debounce(async () => {
-  let response = await pyApiSeveice.post("/openalex/googledistance_subject", {
+  let response = await pyApiService.post("/openalex/googledistance_subject", {
     countryA: appStore.states.CountryA,
     countryB: appStore.states.CountryB,
     subjectA: appStore.states.SubjectA,

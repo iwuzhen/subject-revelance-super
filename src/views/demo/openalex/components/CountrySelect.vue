@@ -5,7 +5,7 @@ el-select(v-if="multiple", v-model="country",:placeholder="placeholder",multiple
     span(style="float: left;line-height: inherit;"  :class="`fi fi-${item.toLowerCase()}`")
     span(style="margin-left:10px;")   {{ item }}
 
-el-select(v-else v-model="country",:placeholder="placeholder",style="width: 100%",size='large',@change='change', :multiple="multiple")
+el-select(v-else v-model="country",:placeholder="placeholder",style="width: 100%",size='large',@change='change')
   template(v-slot:prefix)
     span(:class="`fi fi-${country.toLowerCase()}`")
   el-option(v-for="item in CountryCodes",:key="item",:label="item",:value="item")

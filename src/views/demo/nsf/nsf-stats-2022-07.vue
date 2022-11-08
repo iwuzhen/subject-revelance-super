@@ -63,7 +63,7 @@ import { reactive, onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 import { dataSetAddNewColume } from "@/utils/echartsTool";
-import { localSeveice } from "@/utils/requests";
+import { localService } from "@/utils/requests";
 
 const appHomeStore = homeStore();
 appHomeStore.title = "NSF 数据统计";
@@ -1940,7 +1940,7 @@ let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
   // 项目和资金数
-  let response = await localSeveice.get(
+  let response = await localService.get(
     "static/data/nsf/fund-and-project.json"
   );
   let dataSet = response.data;
@@ -1958,7 +1958,7 @@ const updateChart = _.debounce(async () => {
   });
 
   // NIH 资金数
-  response = await localSeveice.get("static/data/nih/appropriations.json");
+  response = await localService.get("static/data/nih/appropriations.json");
   let dataSet_nih = response.data;
   dataSetAddNewColume(dataSet_nih, "TotalM", (obj: any) => {
     return obj.Total / 1000;
@@ -2121,7 +2121,7 @@ const updateChart = _.debounce(async () => {
 
 const updateNextChart = _.debounce(async () => {
   // NSF Directorate  资金分布
-  let response = await localSeveice.get(
+  let response = await localService.get(
     "static/data/nsf/directorate-fund.json"
   );
   let dataSet1 = response.data;

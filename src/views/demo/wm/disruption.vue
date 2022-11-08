@@ -30,7 +30,7 @@ import _ from "lodash";
 import { onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
-import { localSeveice } from "@/utils/requests";
+import { localService } from "@/utils/requests";
 
 const appHomeStore = homeStore();
 appHomeStore.title = "WM 颠覆度学科逐年分布";
@@ -119,7 +119,7 @@ const updateChart = _.debounce(async () => {
   if (appStore.states.chartTypeSelect === 0) {
     url = "static/data/wm/average-disrution.json";
   }
-  let response = await localSeveice.get(url);
+  let response = await localService.get(url);
   let option = extendEchartsOpts({
     title: {
       left: "center",
