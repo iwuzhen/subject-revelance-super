@@ -9,7 +9,7 @@ el-container
           GoogleDistanceCountrySubject
         el-tab-pane(label='国家的论文数' name='c' lazy) 国家的论文数
           CountryWorksCount
-        el-tab-pane(label='学科间的距离' name='d' lazy) 国家学科间的距离
+        el-tab-pane(label='学科间距离的引力图' name='d' lazy) 学科间距离的引力图
           DistanceForceGraph
           
     el-row 

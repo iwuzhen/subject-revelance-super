@@ -4,17 +4,24 @@ el-container
     el-row
       el-col(:span="10")
         el-form-item(label="国家:" size="large")
-          CountrySelect(placeholder="选择国家",v-model="appStore.states.Country",@change='updateChart', :multiple="true")
+          CountrySelect(placeholder="选择国家",v-model="appStore.states.Country",@change='updateData', :multiple="true")
 
       el-col(:span="10")
         el-form-item(label="学科:" size="large")
-          el-select(v-model="appStore.states.Subject",placeholder="学科",style="width: 100%",size='large',@change='updateChart',multiple)
+          el-select(v-model="appStore.states.Subject",placeholder="学科",style="width: 100%",size='large',@change='updateData',multiple)
             el-option(v-for="item of subjectOpt",:key="item.id",:label="item.name",:value="item.id")
 
+      el-col(:span="10")
+        el-form-item(label="保留的距离上限:" size="large")
+          el-input-number(v-model="appStore.states.topDistance" :precision="2" :step="0.01" :max="1" :min="0" @change='updateChart')
+      el-col(:span="10")
+        el-form-item(label="分组方式:" size="large")
+          el-select(v-model="appStore.states.showFlag",style="width: 100%",size='large',@change='updateChart')
+            el-option(v-for="item of showFlagOpt",:key="item.value",:label="item.label",:value="item.value")
     el-row
       el-col(:span="24")
         #echartForceCountrySubject.echart
-
+        
   </template>
 
 <script lang="ts">
@@ -28,7 +35,7 @@ export default {
 
 <script setup lang="ts">
 import { homeStore, dynamicStore } from "@/pinia/modules/pageStore";
-import _ from "lodash";
+import _, { concat, entries, keyBy } from "lodash";
 import { onMounted } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
@@ -57,123 +64,130 @@ const subjectOpt = [
   { id: 162324750, name: "Economics" },
 ].sort((a: any, b: any) => a.name.localeCompare(b.name));
 
-console.log(subjectOpt);
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex country google distance";
 const appStore = dynamicStore("openalex-country-subject-distance-force", {
-  Country: [
-    "CN",
-    "GB",
-    "DE",
-    "JP",
-    "FR",
-    "IN",
-    "CA",
-    "BR",
-    "IT",
-    "AU",
-    "ES",
-    "KR",
-    "RU",
-    "NL",
-    "IL",
+  Country: ["US", "CN", "GB", "DE", "JP", "IN"],
+  Subject: [
+    127413603, 33923547, 121332964, 15744967, 41008148, 185592680, 138885662,
+    144024400, 86803240, 162324750,
   ],
-  Subject: [33923547],
+  topDistance: 0.45,
+  showFlag: 1,
 });
 let myChartObjs: echarts.ECharts[] = [];
+const showFlagOpt = [
+  {
+    value: 0,
+    label: "按国家分组",
+  },
+  {
+    value: 1,
+    label: "按学科分组分组",
+  },
+];
 
-const updateChart = _.debounce(async () => {
+let responseData: any;
+const updateData = _.debounce(async () => {
   let response = await pyApiService.post(
     "/openalex/force_distance_country_subject",
     {
       countries: appStore.states.Country,
       subjects: appStore.states.Subject,
+      maxDistance: appStore.states.topDistance,
     }
   );
-  console.log("response.data", response.data);
-  let option = extendEchartsOpts({
-    title: {
-      left: "center",
-      top: "1%",
-      textAlign: "center",
-      textStyle: {
-        fontSize: 20,
-      },
-      // text: "subject country google distance",
-    },
-    xAxis: {
-      name: "year",
-      type: "category",
-    },
-    legend: {
-      show: true,
-    },
-    yAxis: [
-      {
-        // position: "left",
-        // name: "disruption",
-        type: "value",
-        min: "dataMin",
-      },
-    ],
-    dataset: [
-      {
-        source: response.data.data,
-        dimensions: response.data.dimensions,
-      },
-    ],
-    tooltip: {
-      formatter: function (params: any) {
-        params.sort((x: any, y: any) => {
-          let dataIDX: number = x.encode.y[0];
-          let dataIDY: number = y.encode.y[0];
-          // if (y.data === undefined) {
-          //   return -1;
-          // }
-          return y.data[dataIDY] - x.data[dataIDX];
-        });
-        let showHtm = ` ${params[0].name}<br>`;
-        for (let i = 0; i < params.length; i++) {
-          let dataID: number = params[i].encode.y[0];
-          if (params[i].data === undefined) {
-            continue;
-          }
-          const _text = params[i].seriesName;
-          let _data = params[i].data[dataID];
-          const _marker = params[i].marker;
-          if (_text.includes("占比")) {
-            _data = _.round(_data * 100, 4) + "%";
-          }
-          showHtm += `${_marker}${_text}：${_data}<br>`;
-        }
-        return showHtm;
-      },
-    },
-    series: response.data.dimensions.slice(1).map((item: string) => {
-      return {
-        datasetIndex: 0,
-        type: "line",
-        name: item,
-        encode: {
-          x: "year",
-          y: item,
-        },
-      };
-    }),
-  });
-  console.log("set opion:", option);
-  // myChartObjs[0].clear();
-  myChartObjs[0].setOption(option, true);
+  responseData = response.data;
+  updateChart();
 }, 1000);
 
+const updateChart = _.debounce(async () => {
+  // filter links
+  let linksMatrix = responseData.links.map((item: any[]) => {
+    return item.filter((v) => v.value <= appStore.states.topDistance);
+  });
+
+  // build category
+  const categories: any[] = [];
+  let gp = _.groupBy(
+    responseData.nodes,
+    (item) => item.name.split("-")[appStore.states.showFlag]
+  );
+  console.log("gp", gp);
+  let categoryIndex = 0;
+  let nodeNameMapCategoryIndex = new Map();
+  for (let [key, items] of Object.entries(gp)) {
+    items.forEach((item) => {
+      nodeNameMapCategoryIndex.set(item.name, categoryIndex);
+    });
+    categoryIndex += 1;
+    categories.push({ name: key });
+  }
+  responseData.nodes.forEach((item: any) => {
+    item.category = nodeNameMapCategoryIndex.get(item.name);
+  });
+
+  let timeline: echarts.TimelineComponentOption = {
+    data: responseData.years,
+    autoPlay: false,
+    axisType: "category",
+    loop: false,
+  };
+  let options = linksMatrix.map((item: any, index: number) => {
+    return {
+      title: {
+        left: "center",
+        top: "1%",
+        textAlign: "center",
+        textStyle: {
+          fontSize: 20,
+        },
+        text: responseData.years[index],
+      },
+      legend: {
+        show: true,
+        type: "scroll",
+        left: "left",
+        orient: "vertical",
+      },
+      series: {
+        type: "graph",
+        layout: "force",
+        data: responseData.nodes,
+        categories,
+        links: item,
+        roam: true,
+        label: {
+          position: "right",
+        },
+        force: {
+          repulsion: 50,
+          // layoutAnimation: false,
+          edgeLength: [10, 50],
+          friction: 0.05,
+          initLayout: "circular",
+        },
+      },
+    };
+  });
+
+  let option: echarts.EChartsOption = {
+    timeline,
+    options,
+  };
+  console.log("set option:", option);
+
+  myChartObjs[0].setOption<echarts.EChartsOption>(option, false);
+}, 500);
+
 onMounted(() => {
-  for (let chartName of ["echartCountrySubject"]) {
+  for (let chartName of ["echartForceCountrySubject"]) {
     let elem = document.getElementById(chartName);
     if (elem) {
       myChartObjs.push(echarts.init(elem));
     }
   }
-  updateChart();
+  updateData();
   window.onresize = _.debounce(() => {
     myChartObjs.forEach((element) => {
       element.resize();
@@ -181,20 +195,3 @@ onMounted(() => {
   }, 500);
 });
 </script>
-
-<style lang="less">
-// .el-col {
-//   margin: 20px 10px;
-// }
-.echart {
-  width: 95vw;
-  height: 600px;
-}
-.radius {
-  // height: 40px;
-  // width: 70%;
-  border: 1px solid var(--el-border-color);
-  border-radius: 20px;
-  padding: 5px;
-}
-</style>
