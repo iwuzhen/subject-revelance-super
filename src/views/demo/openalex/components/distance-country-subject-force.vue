@@ -19,7 +19,7 @@ el-container
           el-select(v-model="appStore.states.showFlag",style="width: 100%",size='large',@change='updateChart')
             el-option(v-for="item of showFlagOpt",:key="item.value",:label="item.label",:value="item.value")
     el-row
-      el-col(:span="24")
+      el-col(:span="24" v-loading="loading")
         #echartForceCountrySubject.echart
         
   </template>
@@ -36,7 +36,7 @@ export default {
 <script setup lang="ts">
 import { homeStore, dynamicStore } from "@/pinia/modules/pageStore";
 import _, { concat, entries, keyBy } from "lodash";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 import { pyApiService } from "@/utils/requests";
@@ -87,8 +87,11 @@ const showFlagOpt = [
   },
 ];
 
+const loading = ref(false);
+
 let responseData: any;
 const updateData = _.debounce(async () => {
+  loading.value = true;
   let response = await pyApiService.post(
     "/openalex/force_distance_country_subject",
     {
@@ -99,6 +102,7 @@ const updateData = _.debounce(async () => {
   );
   responseData = response.data;
   updateChart();
+  loading.value = false;
 }, 1000);
 
 const updateChart = _.debounce(async () => {
