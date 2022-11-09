@@ -73,7 +73,7 @@ const appStore = dynamicStore("openalex-country-subject-distance-force", {
     144024400, 86803240, 162324750,
   ],
   topDistance: 0.45,
-  showFlag: 1,
+  showFlag: 0,
 });
 let myChartObjs: echarts.ECharts[] = [];
 const showFlagOpt = [
