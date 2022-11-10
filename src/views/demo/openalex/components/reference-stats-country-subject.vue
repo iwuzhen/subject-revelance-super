@@ -15,11 +15,11 @@ el-main
     el-col(:span="10"  v-if="chartTypeLink[appStore.states.chartType].cat1")
       el-form-item(label="学科a:" size="large")
         el-select(v-model="appStore.states.CatA",placeholder="学科a",style="width: 100%",size='large',@change='updateChart')
-          el-option(v-for="item of subjectOpt",:key="item.id",:label="item.name",:value="item.id")
+          el-option(v-for="item of subjectOpt",:key="item.name",:label="item.name",:value="item.name")
     el-col(:span="10"  v-if="chartTypeLink[appStore.states.chartType].cat2")
       el-form-item(label="学科b:" size="large")
         el-select(v-model="appStore.states.CatB",placeholder="学科b",style="width: 100%",size='large',@change='updateChart',multiple)
-          el-option(v-for="item of subjectOpt",:key="item.id",:label="item.name",:value="item.id")
+          el-option(v-for="item of subjectOpt",:key="item.name",:label="item.name",:value="item.name")
   el-row
     el-col(:span="24")
       #echartCountrySubject.echart
