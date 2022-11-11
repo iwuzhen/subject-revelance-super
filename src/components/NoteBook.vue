@@ -40,7 +40,7 @@ const saveNoteBook = async (data: string) => {
       type: "warning",
     });
   }
-  modified.value = true;
+  modified.value = false;
 };
 
 const text = ref("");
