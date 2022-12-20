@@ -37,7 +37,7 @@ import { extendEchartsOpts } from "@/utils/model";
 import { ElMessage } from "element-plus";
 
 const appHomeStore = homeStore();
-appHomeStore.title = "MAG FOS trend";
+appHomeStore.title = "E1200 entropy";
 let dataset: any;
 const paperLoading = ref(false);
 
