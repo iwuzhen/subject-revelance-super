@@ -319,11 +319,9 @@ const updateChart = _.debounce(async () => {
 }, 1000);
 
 onMounted(() => {
-  for (let chartName of [chartID]) {
-    let elem = document.getElementById(chartName);
-    if (elem) {
-      MyChartObj = echarts.init(elem);
-    }
+  let elem = document.getElementById(chartID);
+  if (elem) {
+    MyChartObj = echarts.init(elem);
   }
   updateChart();
   window.onresize = _.debounce(() => {
