@@ -7,8 +7,6 @@ el-container
           ReferenceCountry     
         el-tab-pane(label='学科间的自恋度' name='b' lazy) 学科间的自恋度
           ReferenceCountrySubject     
-
-          
     el-row 
       NoteBook(storagekey="openalex_reference_country_stats",:editMode="true")
   </template>

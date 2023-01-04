@@ -35,7 +35,7 @@ export default {
 
 <script setup lang="ts">
 import { homeStore, dynamicStore } from "@/pinia/modules/pageStore";
-import _, { concat, entries, keyBy } from "lodash";
+import _ from "lodash";
 import { onMounted, ref } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
