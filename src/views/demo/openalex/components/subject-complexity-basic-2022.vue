@@ -66,7 +66,7 @@ const appStore = dynamicStore(
   `openalex-country-distance-basic-${props.typeMode}`,
   {
     Country: "CN",
-    CountryMultiple: ["CN", "US"],
+    CountryMultiple: ["CN", "US", "GB", "DE", "JP", "FR"],
     Subject: "Medicine",
     TopN: 1000,
     linksInThreshold: 100,
@@ -229,6 +229,14 @@ const updateChart = _.debounce(async () => {
     year += 2;
   }
 
+  // series rank by last year date
+  let dimensions = dataSet[0].slice(1);
+  let dimensionsValue = dataSet.slice(-1)[0].slice(1);
+  // console.log("dataSet", dataSet, dataSet.slice(-1));
+  dimensions = _.unzip(
+    _.zip(dimensions, dimensionsValue).sort((a: any[], b: any[]) => b[1] - a[1])
+  )[0];
+  console.log("dimensions", dimensions);
   // if (props.typeMode == 0) {
   // } else {
   // }
@@ -292,7 +300,7 @@ const updateChart = _.debounce(async () => {
         return showHtm;
       },
     },
-    series: dataSet[0].slice(1).map((item: string) => {
+    series: dimensions.map((item: string) => {
       return {
         datasetIndex: 0,
         type: "line",
