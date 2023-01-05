@@ -18,7 +18,11 @@ el-container
         el-form-item(label="TopN:" size="large")
           el-select(v-model="appStore.states.TopN",placeholder="TopN",style="width: 100%",size='large',@change='updateChart')
             el-option(v-for="key in 20",:key="key",:label="key*1000",:value="key*1000")
-
+      el-col(:span="6")
+        el-form-item(label="统计参数:" size="large")
+          el-select(v-model="appStore.states.tj_type",placeholder="tj_type",style="width: 100%",size='large',@change='updateChart')
+            el-option(label="统计数值",:value="0")
+            el-option(label="统计比例",:value="1")
       el-col(:span="6")
         el-form-item(label="linksin 阈值:" size="large")
           el-select(v-model="appStore.states.linksInThreshold",placeholder="阈值",style="width: 100%",size='large',@change='updateChart')
@@ -62,6 +66,8 @@ const props = defineProps({
 // 1: 1个国家内的学科年度比较
 // 2: 1个学科内的国家间年度比较
 
+// tj_type=[0:统计数值 1:统计比例]
+
 const appStore = dynamicStore(
   `openalex-country-distance-basic-${props.typeMode}`,
   {
@@ -70,6 +76,7 @@ const appStore = dynamicStore(
     Subject: "Medicine",
     TopN: 1000,
     linksInThreshold: 100,
+    tj_type: 1,
   }
 );
 
@@ -148,6 +155,7 @@ const updateChart = _.debounce(async () => {
     countries: CountryCodes.join(","), //100多个国家列表
     linksin_yz: appStore.states.linksInThreshold, //[100,1000,10000]
     year: 2000, //[1980,2022],空字符串表示查询所有
+    tj_type: appStore.states.tj_type,
   };
 
   let dataSet: any[] = [];
