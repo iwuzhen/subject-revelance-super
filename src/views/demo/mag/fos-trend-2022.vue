@@ -172,12 +172,12 @@ const handleClose = (tag: string) => {
 };
 
 const OriginCategoriesPath =
-  "https://wiki.nikepai.com:10444/api/mag/getOriginCategories";
+  "https://hz.nikepai.com:10444/api/mag/getOriginCategories";
 const ChildCategoriesPath =
-  "https://wiki.nikepai.com:10444/api/mag/getChildCategories";
+  "https://hz.nikepai.com:10444/api/mag/getChildCategories";
 const ParentCategoriesPath =
-  "https://wiki.nikepai.com:10444/api/mag/getParentCategories";
-const GetFosByNamePath = "https://wiki.nikepai.com:10444/api/mag/getFosByName";
+  "https://hz.nikepai.com:10444/api/mag/getParentCategories";
+const GetFosByNamePath = "https://hz.nikepai.com:10444/api/mag/getFosByName";
 const queryFlag = ref(true);
 const dialogTableVisible = ref(false);
 const dialogTreeVisible = ref(false);

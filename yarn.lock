@@ -1157,6 +1157,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/colormap@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.npmmirror.com/@types/colormap/-/colormap-2.3.1.tgz#2b1d63f58ba541b81b99ad0b743cece7c0ff5f67"
+  integrity sha512-GCPa0VCih4kp/TPPkjdjgUG19yCOPbpP9UpjEYTxUnIhaNqMrhlL9wSAyxm0cRfSubT3KUETZ+8vXYn6fmq0OQ==
+
 "@types/connect-history-api-fallback@^1.3.5":
   version "1.3.5"
   resolved "https://registry.npmmirror.com/@types/connect-history-api-fallback/-/connect-history-api-fallback-1.3.5.tgz#d1f7a8a09d0ed5a57aee5ae9c18ab9b803205dae"
@@ -2540,6 +2545,13 @@ colorette@^2.0.10:
   version "2.0.19"
   resolved "https://registry.npmmirror.com/colorette/-/colorette-2.0.19.tgz#cdf044f47ad41a0f4b56b3a0d5b4e6e1a2d5a798"
   integrity sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==
+
+colormap@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.npmmirror.com/colormap/-/colormap-2.3.2.tgz#4422c1178ce563806e265b96782737be85815abf"
+  integrity sha512-jDOjaoEEmA9AgA11B/jCSAvYE95r3wRoAyTf3LEHGiUVlNHJaL1mRkf5AyLSpQBVGfTEPwGEqCIzL+kgr2WgNA==
+  dependencies:
+    lerp "^1.0.3"
 
 combined-stream@^1.0.8:
   version "1.0.8"
@@ -4299,6 +4311,11 @@ launch-editor@^2.2.1, launch-editor@^2.4.0:
   dependencies:
     picocolors "^1.0.0"
     shell-quote "^1.6.1"
+
+lerp@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmmirror.com/lerp/-/lerp-1.0.3.tgz#a18c8968f917896de15ccfcc28d55a6b731e776e"
+  integrity sha512-70Rh4rCkJDvwWiTsyZ1HmJGvnyfFah4m6iTux29XmasRiZPDBpT9Cfa4ai73+uLZxnlKruUS62jj2lb11wURiA==
 
 less-loader@^8.0.0:
   version "8.1.1"
