@@ -11,6 +11,7 @@
     "axios": "^0.27.2",
     "colormap": "^2.3.2",
     "core-js": "^3.8.3",
+    "d3-scale": "^4.0.2",
     "dayjs": "^1.11.4",
     "echarts": "^5.3.3",
     "element-plus": "^2.2.8",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@types/colormap": "^2.3.1",
+    "@types/d3-scale": "^4.0.3",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-babel": "~5.0.0",
