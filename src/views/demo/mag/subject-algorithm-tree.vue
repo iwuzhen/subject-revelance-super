@@ -3757,58 +3757,19 @@ onMounted(() => {
 .echartForce {
   height: 80vh;
 }
-.card-header {
-  .el-row {
-    margin: 0;
-    .el-col {
-      margin: 0;
-      .el-tag {
-        margin: 0;
-      }
-    }
-  }
-}
-.el-select {
-  width: 95%;
-}
-.el-card {
-  width: 10rem;
-  text-align: end;
-  .el-row {
-    margin: 0;
-    .author {
-      margin-right: 10px;
-      .name {
-        white-space: nowrap;
-        font-style: normal;
-      }
-      .org {
-        white-space: nowrap;
-        font-style: italic;
-      }
-    }
-  }
-  .card-header {
-    text-align: end;
-    .zh {
-      font-style: italic;
-    }
-  }
-  .tag {
-    .el-tag {
-      margin-left: 5px;
-    }
-  }
-}
-.el-popper.is-customized {
-  /* Set padding to ensure the height is 32px */
-  padding: 6px 12px;
-  background: linear-gradient(90deg, rgb(159, 229, 151), rgb(204, 229, 129));
+
+.el-row {
+  margin: 0;
+  padding: 0;
 }
 
-.el-popper.is-customized .el-popper__arrow::before {
-  background: linear-gradient(45deg, #b2e68d, #bce689);
-  right: 0;
+.el-form-item {
+  margin: 0;
+  padding: 0;
+}
+
+.el-select {
+  width: 95%;
 }
 
 .colorPicker .el-form-item {
