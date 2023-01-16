@@ -6,7 +6,7 @@ el-container
         el-form-item(label="层级:" size="large")
           el-select(v-model="appStore.states.graphModeSelect",placeholder="层级",style="width: 100%",size='large',@change='updateChart')
             el-option(v-for="item in graphMode",:key="item.text",:label="item.text",:value="item.value")
-      el-col(:span="12")
+      el-col(:span="18")
         el-form-item(label="平均度数:" size="large")
           el-radio-group.ml-4(v-model="appStore.states.linksMultiple" @change='updateChart')
             el-radio-button(:label="0" size="large") 2(最小生成树)
@@ -22,6 +22,10 @@ el-container
             el-radio-button(:label="11" size="large") 13
             el-radio-button(:label="13" size="large") 15
 
+    el-row
+      el-col(:span="6")
+        el-form-item(label="染色模式:" size="large")
+          el-switch(v-model="categoryMode"  size="large"  active-text="Subject" inactive-text="InfoMap" @change='updateChart')
       el-col(:span="6")
         el-form-item(label="展示标签:" size="large")
           el-switch(v-model="labelShow"  size="large"  active-text="T" inactive-text="F" @change='updateChart')
@@ -52,14 +56,11 @@ export default {
 <script setup lang="ts">
 import { homeStore, dynamicStore } from "@/pinia/modules/pageStore";
 import NoteBook from "@/components/NoteBook.vue";
-import { localService } from "@/utils/requests";
-import { reactive, ref, onMounted } from "vue";
-// import colormap from "colormap";
+import { ref, onMounted } from "vue";
+import Infomap from "@mapequation/infomap";
 import _ from "lodash";
 import * as echarts from "echarts";
-import { extendEchartsOpts } from "@/utils/model";
 import { ElMessage } from "element-plus";
-// import {scaleLinear} from "d3-scale";
 import { scaleLinear } from "d3-scale";
 
 const appHomeStore = homeStore();
@@ -67,6 +68,7 @@ appHomeStore.title = "subject algorithm tree";
 let dataset: any;
 const paperLoading = ref(false);
 const labelShow = ref(false);
+const categoryMode = ref(true);
 
 const subjectOrder = [
   { name: "Art" },
@@ -3585,6 +3587,7 @@ const updateChart = _.debounce(async () => {
   let graph: any;
   if (appStore.states.graphModeSelect === 0) {
     graph = Object.assign(lv1_subject_data);
+    graph = Object.assign(lv1_subject_data);
     graph.links = lv1_spanning_tree_links.map((item) => {
       return {
         source: item[0],
@@ -3634,8 +3637,56 @@ const updateChart = _.debounce(async () => {
     return item;
   });
 
+  if (categoryMode.value === false) {
+    console.log(graph.nodes);
+    // use infoMap to stain category
+    let networkList = [`#source target [weight]\n`];
+    for (let row of graph.links) {
+      networkList.push(`${row.source} ${row.target} ${row.value}`);
+    }
+    let infomap = new Infomap()
+      .on("data", (data) => console.log(data))
+      .on("error", (err) => console.warn(err))
+      .on("finished", (data) => {
+        if (!data.clu) return;
+        console.log(data);
+        let categoriesSet = new Set();
+        let nodeCategoriesMap = new Map();
+        let categories = [];
+        for (let row of data.clu.split("\n")) {
+          if (row.startsWith("#")) continue;
+          let column = row.split(" ");
+          if (column.length !== 3) continue;
+          if (!categoriesSet.has(column[1])) {
+            categories.push({
+              name: column[1],
+            });
+            categoriesSet.add(column[1]);
+            // 模式 infoMap 按顺序返回的 clu ID
+          }
+          nodeCategoriesMap[Number(column[0])] = Number(column[1]) - 1;
+        }
+        for (let node of graph.nodes) {
+          node.category = nodeCategoriesMap[node.id];
+        }
+        graph.categories = categories;
+        console.log(graph);
+        setOptions(graph);
+      });
+    let network = networkList.join("\n");
+    console.log(network);
+    infomap.run({ network, args: "--clu" });
+  } else {
+    setOptions(graph);
+  }
   // set graph size
+}, 1000);
 
+const setOptions = (graph: {
+  categories: { name: any }[];
+  nodes: any;
+  links: any;
+}) => {
   let option = {
     title: {
       left: "center",
@@ -3645,7 +3696,7 @@ const updateChart = _.debounce(async () => {
       textStyle: {
         fontSize: 20,
       },
-      text: graphTitle,
+      // text: graphTitle,
     },
     tooltip: {},
     legend: {
@@ -3686,7 +3737,7 @@ const updateChart = _.debounce(async () => {
   };
   console.log("set opion:", option);
   myChartObjs[0].setOption(option, true);
-}, 1000);
+};
 
 onMounted(() => {
   let elem = document.getElementById("echart1");
@@ -3706,7 +3757,7 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .echartForce {
-  height: 100vh;
+  height: 80vh;
 }
 .card-header {
   .el-row {
