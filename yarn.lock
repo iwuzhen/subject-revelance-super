@@ -1067,6 +1067,11 @@
   resolved "https://registry.npmmirror.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
+"@mapequation/infomap@^2.6.1":
+  version "2.6.1"
+  resolved "https://registry.npmmirror.com/@mapequation/infomap/-/infomap-2.6.1.tgz#a7e1123527e17e9a8be5c0255fd0bc3f2d45195d"
+  integrity sha512-sIoPQ05Tr1kSgnbdk4NbuNEWMYoj7MUzryYj+PL2SBZueFex98QKiDJABwg0bsyQJshDTaemVmYJdHfAp/+/UQ==
+
 "@node-ipc/js-queue@2.0.3":
   version "2.0.3"
   resolved "https://registry.npmmirror.com/@node-ipc/js-queue/-/js-queue-2.0.3.tgz#ac7fe33d766fa53e233ef8fedaf3443a01c5a4cd"
