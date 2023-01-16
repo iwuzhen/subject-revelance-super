@@ -3583,10 +3583,8 @@ const graphMode = [
 let myChartObjs: echarts.ECharts[] = [];
 
 const updateChart = _.debounce(async () => {
-  let graphTitle = "";
   let graph: any;
   if (appStore.states.graphModeSelect === 0) {
-    graph = Object.assign(lv1_subject_data);
     graph = Object.assign(lv1_subject_data);
     graph.links = lv1_spanning_tree_links.map((item) => {
       return {
@@ -3620,7 +3618,6 @@ const updateChart = _.debounce(async () => {
     let count = appStore.states.linksMultiple * 146;
     for (let index in lv2_extend_links) {
       if (Number(index) > count) break;
-      // console.log(index);
       graph.links.push({
         source: lv2_extend_links[index][0],
         target: lv2_extend_links[index][1],
@@ -3637,7 +3634,7 @@ const updateChart = _.debounce(async () => {
     return item;
   });
 
-  if (categoryMode.value === false) {
+  if (categoryMode.value == false) {
     console.log(graph.nodes);
     // use infoMap to stain category
     let networkList = [`#source target [weight]\n`];
@@ -3649,6 +3646,7 @@ const updateChart = _.debounce(async () => {
       .on("error", (err) => console.warn(err))
       .on("finished", (data) => {
         if (!data.clu) return;
+        let graphCopy = _.cloneDeep(graph);
         console.log(data);
         let categoriesSet = new Set();
         let nodeCategoriesMap = new Map();
@@ -3666,12 +3664,12 @@ const updateChart = _.debounce(async () => {
           }
           nodeCategoriesMap[Number(column[0])] = Number(column[1]) - 1;
         }
-        for (let node of graph.nodes) {
+        for (let node of graphCopy.nodes) {
           node.category = nodeCategoriesMap[node.id];
         }
-        graph.categories = categories;
-        console.log(graph);
-        setOptions(graph);
+        graphCopy.categories = categories;
+        console.log(graphCopy);
+        setOptions(graphCopy);
       });
     let network = networkList.join("\n");
     console.log(network);
@@ -3736,7 +3734,7 @@ const setOptions = (graph: {
     ],
   };
   console.log("set opion:", option);
-  myChartObjs[0].setOption(option, true);
+  myChartObjs[0].setOption(option, false);
 };
 
 onMounted(() => {
