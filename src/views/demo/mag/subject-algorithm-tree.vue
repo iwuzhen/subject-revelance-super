@@ -36,7 +36,7 @@ el-container
         el-collapse
           el-collapse-item.colorPicker(title="颜色修改")
             el-form-item(v-for="(obj, index) in subjectOrder" :key="index" :label="`${obj.name}:`" size="large")
-              el-color-picker(v-model="appStore.states.colorPicksV1[index]" @change='updateChart' show-alpha :predefine="predefineColors")
+              el-color-picker(v-model="appStore.states.colorPicksV2[index]" @change='updateChart' show-alpha :predefine="predefineColors")
             el-button(@click='exportColor' type="primary" style="margin-top:10px") export color
       
     el-row
@@ -3571,25 +3571,25 @@ const lv2_extend_links = [
 const appStore = dynamicStore("subject-algorithm-tree-2022-v13", {
   graphModeSelect: 0,
   linksMultiple: 0,
-  colorPicksV1: [
-    "rgba(255, 105, 180, 0.9)",
+  colorPicksV2: [
+    "rgba(255, 105, 180, 0.97)",
     "rgba(169, 255, 94, 1)",
-    "rgba(218, 168, 239, 0.9)",
+    "rgba(239, 201, 255, 1)",
     "#db6917",
     "#ba1c30",
-    "rgba(150, 167, 230, 1)",
-    "#4277b6",
-    "rgba(145, 139, 139, 0.94)",
+    "rgba(193, 206, 255, 1)",
+    "rgba(29, 29, 29, 1)",
+    "rgba(140, 139, 139, 1)",
     "#5fa641",
     "rgba(232, 233, 72, 1)",
     "#c0bd7f",
     "rgba(130, 238, 255, 1)",
-    "#463397",
+    "rgba(34, 124, 228, 1)",
     "rgba(26, 238, 143, 1)",
-    "rgba(187, 83, 184, 1)",
+    "rgba(255, 25, 251, 1)",
     "rgba(255, 174, 2, 1)",
     "rgba(84, 126, 129, 0.93)",
-    "rgba(185, 207, 109, 1)",
+    "rgba(209, 119, 242, 1)",
     "rgba(255, 180, 161, 1)",
   ],
 });
@@ -3729,7 +3729,7 @@ const setOptions = (graph: {
         return a.name;
       }),
     },
-    color: appStore.states.colorPicksV1,
+    color: appStore.states.colorPicksV2,
     //     color: [
     //   "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff",
     //   "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
@@ -3786,7 +3786,7 @@ const setOptions = (graph: {
 };
 
 const exportColor = () => {
-  alert(JSON.stringify(appStore.states.colorPicksV1));
+  alert(JSON.stringify(appStore.states.colorPicksV2));
 };
 
 onMounted(() => {
