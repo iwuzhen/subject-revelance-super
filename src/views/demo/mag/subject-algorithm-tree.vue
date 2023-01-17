@@ -36,7 +36,9 @@ el-container
         el-collapse
           el-collapse-item.colorPicker(title="颜色修改")
             el-form-item(v-for="(obj, index) in subjectOrder" :key="index" :label="`${obj.name}:`" size="large")
-              el-color-picker(v-model="appStore.states.colorPicks[index]" @change='updateChart')
+              el-color-picker(v-model="appStore.states.colorPicks[index]" @change='updateChart' show-alpha :predefine="predefineColors")
+            el-button(@click='exportColor' type="primary" style="margin-top:10px") export color
+      
     el-row
       el-col(:span="24")
         #echart1.echartForce
@@ -69,6 +71,30 @@ let dataset: any;
 const paperLoading = ref(false);
 const labelShow = ref(false);
 const categoryMode = ref(true);
+
+const predefineColors = [
+  "#7f7e80",
+  "#ebce2b",
+  "#702c8c",
+  "#db6917",
+  "#ba1c30",
+  "#96cde6",
+  "#4277b6", //工程
+  "#1d1d1d",
+  "#5fa641",
+  "#d485b2",
+  "#c0bd7f", // History
+  "#df8461",
+  "#463397",
+  "#e1a11a",
+  "#91218c",
+  "#e8e948",
+  "#7e1510",
+  "#92ae31",
+  // "#6f340d",
+  // "#2b3514",
+  "#d32b1e",
+];
 
 const subjectOrder = [
   { name: "Art" },
@@ -121,7 +147,7 @@ const lv1_subject_data = {
     { name: "Chemistry" },
     { name: "Computer science" },
     { name: "Economics" },
-    { name: "Engineering disciplines" },
+    { name: "Engineering" },
     { name: "Environmental science" },
     { name: "Geography" },
     { name: "Geology" },
@@ -601,7 +627,7 @@ const lv2_subject_data = {
     { name: "Chemistry" },
     { name: "Computer Science" },
     { name: "Economics" },
-    { name: "Engineering disciplines" },
+    { name: "Engineering" },
     { name: "Environmental science" },
     { name: "Geography" },
     { name: "Geology" },
@@ -3542,31 +3568,29 @@ const lv2_extend_links = [
   [35, 93, 0.5033],
 ];
 
-const appStore = dynamicStore("subject-algorithm-tree-2022", {
+const appStore = dynamicStore("subject-algorithm-tree-2022-v1", {
   graphModeSelect: 0,
   linksMultiple: 0,
   colorPicks: [
-    "#7f7e80",
-    "#ebce2b",
-    "#702c8c",
+    "rgba(255, 105, 180, 0.94)",
+    "rgba(124, 252, 0, 1)",
+    "rgba(218, 168, 239, 0.68)",
     "#db6917",
     "#ba1c30",
-    "#96cde6",
-    "#4277b6", //工程
-    "#1d1d1d",
+    "rgba(179, 217, 234, 0.97)",
+    "rgba(80, 158, 252, 1)",
+    "rgba(186, 148, 242, 1)",
     "#5fa641",
     "#d485b2",
-    "#c0bd7f", // History
-    "#df8461",
+    "rgba(215, 213, 160, 1)",
+    "rgba(255, 209, 192, 1)",
     "#463397",
-    "#e1a11a",
+    "rgba(232, 233, 72, 0.86)",
     "#91218c",
-    "#e8e948",
-    "#7e1510",
-    "#92ae31",
-    // "#6f340d",
-    // "#2b3514",
-    "#d32b1e",
+    "rgba(254, 188, 51, 1)",
+    "rgba(159, 159, 159, 0.82)",
+    "rgba(189, 225, 63, 1)",
+    "rgba(196, 170, 122, 1)",
   ],
 });
 const graphMode = [
@@ -3626,11 +3650,11 @@ const updateChart = _.debounce(async () => {
       });
     }
   }
-  let max = Math.max(...graph.nodes.map((item: any) => item.value));
-  let min = Math.min(...graph.nodes.map((item: any) => item.value));
+  let max = Math.max(...graph.nodes.map((item: any) => Math.sqrt(item.value)));
+  let min = Math.min(...graph.nodes.map((item: any) => Math.sqrt(item.value)));
   let symbolSize_resize = scaleLinear().domain([min, max]).range([10, 30]);
   graph.nodes = graph.nodes.map((item: any) => {
-    item.symbolSize = symbolSize_resize(item.value);
+    item.symbolSize = symbolSize_resize(Math.sqrt(item.value));
     return item;
   });
 
@@ -3706,9 +3730,29 @@ const setOptions = (graph: {
       }),
     },
     color: appStore.states.colorPicks,
+    //     color: [
+    //   "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff",
+    //   "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
+    //   "#c0c0c0", "#808080", "#999999", "#666666", "#333333", "#000000",
+    //   "#f08080"
+    // ],
     series: [
       {
         // name: "subject",
+        tooltip: {
+          formatter: (args: any) => {
+            // console.log(args);
+            if (args.data.category > -1)
+              // return `<b>${
+              //   graph.categories[args.data.category].name
+              // }</b><br />${args.data.name}: ${args.data.value}`;
+              return `<b>${graph.categories[args.data.category].name}</b>`;
+            else
+              return `${graph.nodes[args.data.source - 1].name} <-> ${
+                graph.nodes[args.data.target - 1].name
+              }`;
+          },
+        },
         type: "graph",
         layout: "force",
         draggable: "true",
@@ -3716,7 +3760,7 @@ const setOptions = (graph: {
         links: graph.links,
         categories: graph.categories,
         roam: true,
-        zoom: 1.2,
+        zoom: 0.8,
         label: {
           show: labelShow.value,
           position: "top",
@@ -3724,6 +3768,10 @@ const setOptions = (graph: {
         },
         labelLayout: {
           hideOverlap: true,
+        },
+        itemStyle: {
+          borderColor: "rgba(0, 0, 0, 0.5)",
+          borderWidth: 0.5,
         },
         force: {
           edgeLength: [10, 50],
@@ -3735,6 +3783,10 @@ const setOptions = (graph: {
   };
   console.log("set opion:", option);
   myChartObjs[0].setOption(option, false);
+};
+
+const exportColor = () => {
+  alert(JSON.stringify(appStore.states.colorPicks));
 };
 
 onMounted(() => {
