@@ -36,7 +36,7 @@ el-container
         el-collapse
           el-collapse-item.colorPicker(title="颜色修改")
             el-form-item(v-for="(obj, index) in subjectOrder" :key="index" :label="`${obj.name}:`" size="large")
-              el-color-picker(v-model="appStore.states.colorPicks[index]" @change='updateChart' show-alpha :predefine="predefineColors")
+              el-color-picker(v-model="appStore.states.colorPicksV1[index]" @change='updateChart' show-alpha :predefine="predefineColors")
             el-button(@click='exportColor' type="primary" style="margin-top:10px") export color
       
     el-row
@@ -103,7 +103,7 @@ const subjectOrder = [
   { name: "Chemistry" },
   { name: "Computer Science" },
   { name: "Economics" },
-  { name: "Engineering disciplines" },
+  { name: "Engineering" },
   { name: "Environmental science" },
   { name: "Geography" },
   { name: "Geology" },
@@ -3571,26 +3571,26 @@ const lv2_extend_links = [
 const appStore = dynamicStore("subject-algorithm-tree-2022-v13", {
   graphModeSelect: 0,
   linksMultiple: 0,
-  colorPicks: [
-    "rgba(255, 105, 180, 0.78)",
-    "rgba(124, 252, 0, 1)",
+  colorPicksV1: [
+    "rgba(255, 105, 180, 0.9)",
+    "rgba(169, 255, 94, 1)",
     "rgba(218, 168, 239, 0.9)",
     "#db6917",
     "#ba1c30",
-    "#96cde6",
+    "rgba(150, 167, 230, 1)",
     "#4277b6",
     "rgba(145, 139, 139, 0.94)",
     "#5fa641",
     "rgba(232, 233, 72, 1)",
     "#c0bd7f",
-    "rgba(235, 192, 176, 1)",
+    "rgba(130, 238, 255, 1)",
     "#463397",
-    "rgba(49, 237, 152, 1)",
+    "rgba(26, 238, 143, 1)",
     "rgba(187, 83, 184, 1)",
-    "rgba(225, 161, 26, 1)",
+    "rgba(255, 174, 2, 1)",
     "rgba(84, 126, 129, 0.93)",
-    "#92ae31",
-    "rgba(228, 91, 81, 1)",
+    "rgba(185, 207, 109, 1)",
+    "rgba(255, 180, 161, 1)",
   ],
 });
 const graphMode = [
@@ -3729,7 +3729,7 @@ const setOptions = (graph: {
         return a.name;
       }),
     },
-    color: appStore.states.colorPicks,
+    color: appStore.states.colorPicksV1,
     //     color: [
     //   "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff",
     //   "#800000", "#008000", "#000080", "#808000", "#800080", "#008080",
@@ -3760,7 +3760,7 @@ const setOptions = (graph: {
         links: graph.links,
         categories: graph.categories,
         roam: true,
-        zoom: 0.8,
+        zoom: appStore.states.graphModeSelect === 0 ? 2 : 0.6,
         label: {
           show: labelShow.value,
           position: "top",
@@ -3786,7 +3786,7 @@ const setOptions = (graph: {
 };
 
 const exportColor = () => {
-  alert(JSON.stringify(appStore.states.colorPicks));
+  alert(JSON.stringify(appStore.states.colorPicksV1));
 };
 
 onMounted(() => {
