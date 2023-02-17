@@ -29,6 +29,9 @@ el-container
       el-col(:span="6")
         el-form-item(label="展示标签:" size="large")
           el-switch(v-model="labelShow"  size="large"  active-text="T" inactive-text="F" @change='updateChart')
+      el-col(:span="6")
+        el-form-item(label="固定点:" size="large")
+          el-switch(v-model="fixedNode"  size="large"  active-text="T" inactive-text="F" @change='handleFixedNode')
           
 
     el-row
@@ -71,6 +74,7 @@ let dataset: any;
 const paperLoading = ref(false);
 const labelShow = ref(false);
 const categoryMode = ref(true);
+const fixedNode = ref(false);
 
 const predefineColors = [
   "#7f7e80",
@@ -3573,23 +3577,23 @@ const appStore = dynamicStore("subject-algorithm-tree-2022-v13", {
   linksMultiple: 0,
   colorPicksV2: [
     "rgba(255, 105, 180, 0.97)",
-    "rgba(169, 255, 94, 1)",
-    "rgba(239, 201, 255, 1)",
+    "rgba(152, 252, 65, 1)",
+    "rgba(238, 189, 254, 1)",
     "#db6917",
-    "#ba1c30",
-    "rgba(193, 206, 255, 1)",
-    "rgba(29, 29, 29, 1)",
-    "rgba(140, 139, 139, 1)",
-    "#5fa641",
+    "rgba(128, 49, 231, 1)",
+    "rgba(216, 242, 186, 1)",
+    "rgba(146, 141, 150, 1)",
+    "rgba(124, 181, 234, 1)",
+    "rgba(66, 119, 182, 1)",
     "rgba(232, 233, 72, 1)",
-    "#c0bd7f",
+    "rgba(166, 163, 110, 1)",
     "rgba(130, 238, 255, 1)",
-    "rgba(34, 124, 228, 1)",
-    "rgba(26, 238, 143, 1)",
-    "rgba(255, 25, 251, 1)",
+    "rgba(186, 28, 48, 1)",
+    "rgba(32, 191, 0, 1)",
+    "rgba(153, 106, 152, 1)",
     "rgba(255, 174, 2, 1)",
-    "rgba(84, 126, 129, 0.93)",
-    "rgba(209, 119, 242, 1)",
+    "rgba(254, 79, 79, 0.93)",
+    "rgba(223, 120, 244, 1)",
     "rgba(255, 180, 161, 1)",
   ],
 });
@@ -3604,7 +3608,7 @@ const graphMode = [
   },
 ];
 
-let myChartObjs: echarts.ECharts[] = [];
+let myChartObj: echarts.ECharts;
 
 const updateChart = _.debounce(async () => {
   let graph: any;
@@ -3615,7 +3619,7 @@ const updateChart = _.debounce(async () => {
         source: item[0],
         target: item[1],
         value: 1 - item[2],
-        lineStyle: { width: 3 },
+        lineStyle: { width: 4 },
       };
     });
     let count = appStore.states.linksMultiple * 9;
@@ -3736,6 +3740,20 @@ const setOptions = (graph: {
     //   "#c0c0c0", "#808080", "#999999", "#666666", "#333333", "#000000",
     //   "#f08080"
     // ],
+    toolbox: {
+      right: 0,
+      top: 0,
+      orient: "vertical",
+      feature: {
+        saveAsImage: {},
+        dataZoom: {
+          yAxisIndex: "none",
+        },
+        dataView: { readOnly: false },
+        // magicType: { type: ['line', 'bar'] },
+        restore: {},
+      },
+    },
     series: [
       {
         // name: "subject",
@@ -3770,19 +3788,34 @@ const setOptions = (graph: {
           hideOverlap: true,
         },
         itemStyle: {
-          borderColor: "rgba(0, 0, 0, 0.5)",
-          borderWidth: 0.5,
+          borderColor: "rgba(255, 255, 255, 1)",
+          // borderColor: "rgba(0, 0, 0, 0.5)",
+          borderWidth: 2,
+        },
+        lineStyle: {
+          curveness: 0.02,
         },
         force: {
-          edgeLength: [10, 50],
-          repulsion: 100,
+          initLayout: "circular",
+          edgeLength: [5, 10],
+          repulsion: 70,
+          gravity: 0.01,
           layoutAnimation: true,
         },
       },
     ],
   };
-  console.log("set opion:", option);
-  myChartObjs[0].setOption(option, false);
+  console.log("set option:", option);
+  myChartObj.setOption(option, false);
+};
+
+const handleFixedNode = () => {
+  const option = myChartObj.getOption();
+  for (const i in (option.series as any)[0].data) {
+    (option.series as any)[0].data[i].fixed = fixedNode.value;
+  }
+  console.log((option.series as any)[0].data);
+  myChartObj.setOption(option);
 };
 
 const exportColor = () => {
@@ -3792,16 +3825,29 @@ const exportColor = () => {
 onMounted(() => {
   let elem = document.getElementById("echart1");
   if (elem) {
-    myChartObjs.push(echarts.init(elem));
-  }
-
-  updateChart();
-
-  window.onresize = _.debounce(() => {
-    myChartObjs.forEach((element) => {
-      element.resize();
+    myChartObj = echarts.init(elem, null, {
+      devicePixelRatio: 10,
+      renderer: "svg",
     });
-  }, 500);
+
+    myChartObj.on("mouseup", function (params: any) {
+      let option = myChartObj.getOption();
+      (option.series as any)[0].data[params.dataIndex].x = params.event.offsetX;
+      (option.series as any)[0].data[params.dataIndex].y = params.event.offsetY;
+      (option.series as any)[0].data[params.dataIndex].fixed = true;
+      myChartObj.setOption(option);
+    });
+    myChartObj.on("dblclick", function (params: any) {
+      let option = myChartObj.getOption();
+      (option.series as any)[0].data[params.dataIndex].fixed = false;
+      myChartObj.setOption(option);
+    });
+
+    window.onresize = _.debounce(() => {
+      myChartObj.resize();
+    }, 500);
+    updateChart();
+  }
 });
 </script>
 
