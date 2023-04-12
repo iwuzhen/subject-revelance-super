@@ -51,7 +51,7 @@ import axios from "axios";
 import { extendEchartsOpts } from "@/utils/model";
 import CountrySelect from "./CountrySelect.vue";
 import { customAlphabet } from "nanoid";
-const nanoid = customAlphabet("1234567890abcdef", 10);
+import { nanoid } from "@/utils/tools";
 const chartID = nanoid();
 let loading = ref(false);
 const props = defineProps({
