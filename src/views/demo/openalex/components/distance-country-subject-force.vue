@@ -25,8 +25,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-country-subject-google-distance";
 export default {
-  name: "open-alex-country-subject-google-distance",
+  name: modelName,
   autoIndex: false,
   text: "openalex country google distance",
   update: "2022-10-26T09:43:03.429Z",
@@ -66,7 +67,7 @@ const subjectOpt = [
 
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex country google distance";
-const appStore = dynamicStore("openalex-country-subject-distance-force", {
+const appStore = dynamicStore(modelName, {
   Country: ["US", "CN", "GB", "DE", "JP", "IN"],
   Subject: [
     127413603, 33923547, 121332964, 15744967, 41008148, 185592680, 138885662,

@@ -34,7 +34,7 @@ import * as echarts from "echarts";
 import CountrySelect from "./CountrySelect.vue";
 import { extendEchartsOpts } from "@/utils/model";
 
-const appStore = dynamicStore("openalex-reference-stats", {
+const appStore = dynamicStore("openalex-reference-country-subject", {
   CountryA: "US",
   CountryB: [
     "CN",

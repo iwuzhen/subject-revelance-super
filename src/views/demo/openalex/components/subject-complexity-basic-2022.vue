@@ -34,8 +34,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-subject-complexity-2022";
 export default {
-  name: "openalex-subject-complexity-2022",
+  name: modelName,
   autoIndex: false,
   text: "openalex country google distance",
   update: "2023-01-03T09:43:03.429Z",
@@ -320,7 +321,7 @@ const updateChart = _.debounce(async () => {
       };
     }),
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   // myChartObjs[0].clear();
   MyChartObj.setOption(option, true);
   loading.value = false;

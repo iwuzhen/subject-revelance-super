@@ -22,12 +22,8 @@ el-container
           el-slider(v-model="appStore.states.Year" show-input :min="1955" :max="2022" @change='updateChart')
 
       el-col(:span="8")  
-        el-form-item(label="from node:" size="large")
-          el-slider(v-model="appStore.states.FromNode" show-input :min="1" :max="100000" @change='updateChart')
-
-      el-col(:span="8")  
-        el-form-item(label="to node:" size="large")
-          el-slider(v-model="appStore.states.ToNode" show-input :min="1" :max="100000" @change='updateChart')
+        el-form-item(:label="`node range ${appStore.states.NodeRange[0]}-${appStore.states.NodeRange[1]}:`" size="large")
+          el-slider(v-model="appStore.states.NodeRange" range show-input :min="1" :max="100000" @change='updateChart')
 
     el-row(v-loading="loading")
       el-col(:span="24")
@@ -36,8 +32,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-power-law-point";
 export default {
-  name: "openalex-power-law-point",
+  name: modelName,
   autoIndex: false,
   text: "openalex-power-law-point",
   update: "2023-04-11T09:43:03.429Z",
@@ -107,13 +104,12 @@ const Type_Candidates = ["zipf", "innerzipf"];
 const loading = ref(false);
 // const appHomeStore = homeStore();
 // appHomeStore.title = "openalex power law point year";
-const appStore = dynamicStore("openalex-power-law-point", {
+const appStore = dynamicStore(modelName, {
   DB: "openAlex_nobook_notypenull",
   Cats: ["all_nobook_notypenull", "Materials science"],
   Type: "zipf",
   Year: 2020,
-  FromNode: 100,
-  ToNode: 10000,
+  NodeRange: [100, 10000],
 });
 let myChartObjs: echarts.ECharts[] = [];
 const updateChart = _.debounce(async () => {
@@ -125,8 +121,8 @@ const updateChart = _.debounce(async () => {
       type: appStore.states.Type,
       cats: appStore.states.Cats.join(","),
       year: appStore.states.Year,
-      from_node: appStore.states.FromNode,
-      to_node: appStore.states.ToNode,
+      from_node: appStore.states.NodeRange[0],
+      to_node: appStore.states.NodeRange[1],
     }
   );
   console.log("response.data", response.data);
@@ -135,7 +131,7 @@ const updateChart = _.debounce(async () => {
   let dataset = [data.x, ...data.y];
   dataset = _.zip(...dataset);
   dataset = _.map(dataset, (row) => _.map(row, (num) => _.round(num, 3)));
-  dataset = [data.legend, ...dataset];
+  dataset = [["x", ...data.legend], ...dataset];
 
   let option = extendEchartsOpts({
     title: {
@@ -209,7 +205,7 @@ const updateChart = _.debounce(async () => {
       };
     }),
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option, true);
   loading.value = false;

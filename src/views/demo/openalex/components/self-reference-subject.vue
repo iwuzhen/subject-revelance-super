@@ -18,30 +18,19 @@ el-container
             el-option(v-for="item in Method_Candidates",:key="item",:label="item",:value="item") 
 
       el-col(:span="8")  
-        el-form-item(label="from year:" size="large")
-          el-slider(v-model="appStore.states.From" show-input :min="1955" :max="2022" @change='updateChart')
-
-      el-col(:span="8")  
-        el-form-item(label="to year:" size="large")
-          el-slider(v-model="appStore.states.To" show-input :min="1955" :max="2022" @change='updateChart')
-
-      el-col(:span="8")  
-        el-form-item(label="from node:" size="large")
-          el-slider(v-model="appStore.states.FromNode" show-input :min="1" :max="100000" @change='updateChart')
-
-      el-col(:span="8")  
-        el-form-item(label="to node:" size="large")
-          el-slider(v-model="appStore.states.ToNode" show-input :min="1" :max="100000" @change='updateChart')
+        el-form-item(:label="`year range ${appStore.states.YearRange[0]}-${appStore.states.YearRange[1]}:`" size="large")
+          el-slider(v-model="appStore.states.YearRange" range show-tooltip show-input :min="1955" :max="2022" @change='updateChart')
 
     el-row(v-loading="loading")
       el-col(:span="24")
-        #echart1.echart
+        div.echart(:id="chartID")
 
   </template>
 
 <script lang="ts">
+const modelName = "openalex-subject-self-reference";
 export default {
-  name: "openalex-subject-self-reference",
+  name: modelName,
   autoIndex: false,
   text: "openalex-subject-self-reference",
   update: "2023-04-11T09:43:03.429Z",
@@ -55,6 +44,8 @@ import { onMounted, ref } from "vue";
 import * as echarts from "echarts";
 import { extendEchartsOpts } from "@/utils/model";
 import axios from "axios";
+import { nanoid } from "@/utils/tools";
+const chartID = nanoid();
 
 const DB_Candidates = [
   {
@@ -108,14 +99,11 @@ const Method_Candidates = ["linksin", "linksout"];
 const loading = ref(false);
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex subject self reference";
-const appStore = dynamicStore("openalex-subject-self-reference", {
+const appStore = dynamicStore(modelName, {
   DB: "openAlex",
   Cats: ["Biology", "Chemistry", "Materials science"],
   Method: "linksin",
-  From: 1955,
-  To: 1960,
-  FromNode: 100,
-  ToNode: 200,
+  YearRange: [1955, 2022],
 });
 let myChartObjs: echarts.ECharts[] = [];
 const updateChart = _.debounce(async () => {
@@ -127,8 +115,8 @@ const updateChart = _.debounce(async () => {
       db: appStore.states.DB,
       method: appStore.states.Method,
       str: appStore.states.Cats.join(","),
-      from: appStore.states.From,
-      to: appStore.states.To,
+      from: appStore.states.YearRange[0],
+      to: appStore.states.YearRange[1],
       version: "nobook_notypenull",
     }
   );
@@ -212,14 +200,14 @@ const updateChart = _.debounce(async () => {
       };
     }),
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option, true);
   loading.value = false;
 }, 1000);
 
 onMounted(() => {
-  for (let chartName of ["echart1"]) {
+  for (let chartName of [chartID]) {
     let elem = document.getElementById(chartName);
     if (elem) {
       myChartObjs.push(echarts.init(elem));

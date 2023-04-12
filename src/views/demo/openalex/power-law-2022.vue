@@ -12,8 +12,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-power-law-2022";
 export default {
-  name: "openalex-power-law-2022",
+  name: modelName,
   autoIndex: true,
   text: "openalex power law 2022",
   update: "2023-04-11T01:01:01.429Z",
@@ -33,7 +34,7 @@ const route = useRoute();
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex 幂律";
 
-const appStore = dynamicStore("openalex-power-law-2022", {
+const appStore = dynamicStore(modelName + "tab", {
   tabPosition: "a",
 });
 if (route.query.tab !== undefined) {

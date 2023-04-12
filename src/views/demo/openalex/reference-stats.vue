@@ -14,8 +14,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-self-reference-2022";
 export default {
-  name: "openalex-self-reference-2022",
+  name: modelName,
   autoIndex: true,
   text: "openalex reference stats 自恋度",
   update: "2022-11-02T01:01:01.429Z",
@@ -36,7 +37,7 @@ const route = useRoute();
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex 自恋度";
 
-const appStore = dynamicStore("openalex-country-distance-tab", {
+const appStore = dynamicStore(modelName + "tab", {
   tabPosition: "a",
 });
 if (route.query.tab !== undefined) {

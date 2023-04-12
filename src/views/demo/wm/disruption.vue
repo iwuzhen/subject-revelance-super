@@ -190,7 +190,7 @@ const updateChart = _.debounce(async () => {
       };
     }),
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option);
 }, 1000);

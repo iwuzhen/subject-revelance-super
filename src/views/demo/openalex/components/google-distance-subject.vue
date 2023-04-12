@@ -3,27 +3,23 @@ el-container
   el-main
     el-row
       el-col(:span="4")
-        el-form-item(label="DB:" size="large")
-          el-select(v-model="appStore.states.DB",placeholder="DB",style="width: 100%;",size='large',@change='updateChart')
-            el-option(v-for="item in DB_Candidates",:key="item.value",:label="item.label",:value="item.value") 
+        el-form-item(label="catA:" size="large")
+          el-select(v-model="appStore.states.CatA",placeholder="catA",style="width: 100%;",size='large',@change='updateChart')
+            el-option(v-for="item in Cats_Candidates",:key="item",:label="item",:value="item") 
             
       el-col(:span="14")  
-        el-form-item(label="cat:" size="large")
-          el-select(v-model="appStore.states.Cats",placeholder="cat",style="width: 100%;",size='large',@change='updateChart' multiple)
+        el-form-item(label="catB:" size="large")
+          el-select(v-model="appStore.states.CatB",placeholder="catB",style="width: 100%;",size='large',@change='updateChart' multiple)
             el-option(v-for="item in Cats_Candidates",:key="item",:label="item",:value="item") 
 
       el-col(:span="4")  
-        el-form-item(label="type:" size="large")
-          el-select(v-model="appStore.states.Type",placeholder="type",style="width: 100%;",size='large',@change='updateChart')
-            el-option(v-for="item in Type_Candidates",:key="item",:label="item",:value="item") 
+        el-form-item(label="method:" size="large")
+          el-select(v-model="appStore.states.Method",placeholder="method",style="width: 100%;",size='large',@change='updateChart')
+            el-option(v-for="item in Method_Candidates",:key="item",:label="item",:value="item") 
 
       el-col(:span="8")  
         el-form-item(:label="`year range ${appStore.states.YearRange[0]}-${appStore.states.YearRange[1]}:`" size="large")
-          el-slider(v-model="appStore.states.YearRange" range show-input :min="1955" :max="2022" @change='updateChart')
-
-      el-col(:span="8")  
-        el-form-item(:label="`node range ${appStore.states.NodeRange[0]}-${appStore.states.NodeRange[1]}:`" size="large")
-          el-slider(v-model="appStore.states.NodeRange" range show-input :min="1" :max="100000" @change='updateChart')
+          el-slider(v-model="appStore.states.YearRange" range show-input :min="1950" :max="2022" @change='updateChart')
 
     el-row(v-loading="loading")
       el-col(:span="24")
@@ -32,11 +28,11 @@ el-container
   </template>
 
 <script lang="ts">
-const modelName = "openalex-power-law-tide";
+const modelName = "openalex-subject-google-distance";
 export default {
   name: modelName,
   autoIndex: false,
-  text: "openalex-power-law-tide",
+  text: "openalex-subject-google-distance",
   update: "2023-04-11T09:43:03.429Z",
 };
 </script>
@@ -59,7 +55,6 @@ const DB_Candidates = [
 ];
 
 const Cats_Candidates = [
-  "all_nobook_notypenull", //:表示openAlex去书，去论文类型为空
   "Materials science",
   "Geology",
   "Geography",
@@ -99,32 +94,33 @@ const Cats_Candidates = [
   "Neuroscience",
   "Literature",
 ];
-const Type_Candidates = ["zipf", "innerzipf"];
+const Method_Candidates = ["linksin", "linksout"];
 
 const loading = ref(false);
 // const appHomeStore = homeStore();
-// appHomeStore.title = "openalex power-law tide";
+// appHomeStore.title = "openalex power law point year";
 const appStore = dynamicStore(modelName, {
-  DB: "openAlex_nobook_notypenull",
-  Cats: ["all_nobook_notypenull", "Materials science"],
-  Type: "zipf",
-  NodeRange: [100, 10000],
-  YearRange: [1955, 2022],
+  CatA: "Physics",
+  CatB: ["Materials science", "Biology", "Chemistry"],
+  Method: "linksin",
+  YearRange: [1950, 2022],
 });
 let myChartObjs: echarts.ECharts[] = [];
 const updateChart = _.debounce(async () => {
   loading.value = true;
   let response = await axios.post(
-    "https://wiki.lmd.knogen.com:10443/api/mag/getZipfAndInnerzipfByYear_v3",
+    "https://wiki.lmd.knogen.com:10443/api/wiki/getMasDistance_v2",
     {
-      db: appStore.states.DB,
-      type: appStore.states.Type,
-      cats: appStore.states.Cats.join(","),
+      strA: appStore.states.CatA,
+      strB: appStore.states.CatB.filter(
+        (item) => item != appStore.states.CatA
+      ).join(","),
+      method: appStore.states.Method,
       from: appStore.states.YearRange[0],
       to: appStore.states.YearRange[1],
-      year: "",
-      from_node: appStore.states.NodeRange[0],
-      to_node: appStore.states.NodeRange[1],
+      qs: -1,
+      version: "openAlex_nobook_notypenull",
+      bf: -1,
     }
   );
   console.log("response.data", response.data);
@@ -133,7 +129,7 @@ const updateChart = _.debounce(async () => {
   let dataset = [data.x, ...data.y];
   dataset = _.zip(...dataset);
   dataset = _.map(dataset, (row) => _.map(row, (num) => _.round(num, 3)));
-  dataset = [["year", ...data.legend], ...dataset];
+  dataset = [["x", ...data.legend], ...dataset];
 
   let option = extendEchartsOpts({
     title: {
@@ -147,14 +143,9 @@ const updateChart = _.debounce(async () => {
     },
     xAxis: {
       name: "year",
-      type: "value",
+      type: "category",
       min: "dataMin",
       max: "dataMax",
-      axisLabel: {
-        formatter: function (value) {
-          return value + "";
-        },
-      },
     },
     legend: {
       show: true,
@@ -162,7 +153,7 @@ const updateChart = _.debounce(async () => {
     },
     yAxis: [
       {
-        name: "slope",
+        name: "distance",
         type: "value",
         min: "dataMin",
       },

@@ -16,8 +16,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-country-google-distance";
 export default {
-  name: "open-alex-country-google-distance",
+  name: modelName,
   autoIndex: false,
   text: "openalex country google distance",
   update: "2022-10-26T09:43:03.429Z",
@@ -66,7 +67,7 @@ const CountryCodes = [
 ];
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex country google distance";
-const appStore = dynamicStore("openalex-country-distance", {
+const appStore = dynamicStore(modelName, {
   CountryA: "US",
   CountryB: [
     "CN",
@@ -185,7 +186,7 @@ const updateChart = _.debounce(async () => {
       };
     }),
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option, true);
 }, 1000);

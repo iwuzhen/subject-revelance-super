@@ -20,10 +20,11 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-works-count";
 export default {
-  name: "open-alex-country-google-distance",
+  name: modelName,
   autoIndex: false,
-  text: "openalex country google distance",
+  text: "openalex works count",
   update: "2022-10-26T09:43:03.429Z",
 };
 </script>
@@ -68,8 +69,8 @@ const WorksTypes = [
   "standar",
 ];
 const appHomeStore = homeStore();
-appHomeStore.title = "openalex country google distance";
-const appStore = dynamicStore("openalex-country-distance", {
+appHomeStore.title = "openalex works count";
+const appStore = dynamicStore(modelName, {
   CountryB: [
     "CN",
     "GB",
@@ -194,7 +195,7 @@ const updateWorkCountChart = _.debounce(async () => {
       };
     }),
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   myChartObjs[0].setOption(option, true);
 }, 1000);
 onMounted(() => {

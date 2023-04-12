@@ -48,8 +48,9 @@ el-container
 </template>
 
 <script lang="ts">
+const modelName = "NSF-stats-2022-07";
 export default {
-  name: "NSF-stats-2022-07",
+  name: modelName,
   autoIndex: true,
   text: "NSF 数据统计",
   update: "2022-07-21T09:43:03.429Z",
@@ -68,7 +69,7 @@ import { localService } from "@/utils/requests";
 const appHomeStore = homeStore();
 appHomeStore.title = "NSF 数据统计";
 
-const appStore = dynamicStore("nsfStatsDemo", {
+const appStore = dynamicStore(modelName, {
   showNIH: true,
   ShowGDP: true,
   ShowFund: true,
@@ -2114,7 +2115,7 @@ const updateChart = _.debounce(async () => {
     series,
   });
 
-  console.log("set opion:", option);
+  console.log("set option:", option);
   myChartObjs[0].clear();
   myChartObjs[0].setOption(option);
 }, 1000);

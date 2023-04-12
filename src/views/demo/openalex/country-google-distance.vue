@@ -11,14 +11,15 @@ el-container
           CountryWorksCount
         el-tab-pane(label='学科间距离的引力图' name='d' lazy) 学科间距离的引力图
           DistanceForceGraph
-          
+
     el-row 
       NoteBook(storagekey="openalex_country_distance",:editMode="true")
 </template>
 
 <script lang="ts">
+const modelName = "country-distance";
 export default {
-  name: "country-distance",
+  name: modelName,
   autoIndex: true,
   text: "openalex country google distance",
   update: "2022-10-26T09:43:03.429Z",
@@ -40,7 +41,7 @@ const route = useRoute();
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex country google distance";
 
-const appStore = dynamicStore("openalex-country-distance-tab", {
+const appStore = dynamicStore(modelName + "tab", {
   tabPosition: "a",
 });
 if (route.query.tab !== undefined) {

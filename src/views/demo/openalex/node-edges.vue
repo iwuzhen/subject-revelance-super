@@ -18,8 +18,9 @@ el-container
   </template>
 
 <script lang="ts">
+const modelName = "openalex-node-edge-stats";
 export default {
-  name: "openalex-node-edge-stats",
+  name: modelName,
   autoIndex: true,
   text: "openalex-node-edge-stats",
   update: "2023-04-11T09:43:03.429Z",
@@ -73,7 +74,7 @@ const Type_Candidates = [
 
 const appHomeStore = homeStore();
 appHomeStore.title = "openalex node edge stats";
-const appStore = dynamicStore("openalex-node-edge", {
+const appStore = dynamicStore(modelName, {
   DB: "openAlex_nobook_notypenull",
   Type: "node",
 });
@@ -157,7 +158,7 @@ const updateChart = _.debounce(async () => {
       },
     },
   });
-  console.log("set opion:", option);
+  console.log("set option:", option);
   // myChartObjs[0].clear();
   myChartObjs[0].setOption(option, true);
 }, 1000);
