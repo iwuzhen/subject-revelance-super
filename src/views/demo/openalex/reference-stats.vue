@@ -40,6 +40,8 @@ appHomeStore.title = "openalex 自恋度";
 const appStore = dynamicStore(modelName + "tab", {
   tabPosition: "a",
 });
+
+console.log("tab", route.query.tab);
 if (route.query.tab !== undefined) {
   appStore.states.tabPosition = route.query.tab;
 }

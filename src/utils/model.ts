@@ -62,7 +62,7 @@ export function extendEchartsOpts(opt: echarts.EChartsOption) {
       orient: "vertical",
     },
     grid: {
-      left: "5%",
+      left: "2%",
       right: "20%",
       bottom: "5%",
       containLabel: true,
