@@ -2,10 +2,10 @@
 el-container
   el-main
     el-row
-      el-col(:span="4")
-        el-form-item(label="DB:" size="large")
-          el-select(v-model="appStore.states.DB",placeholder="DB",style="width: 100%;",size='large',@change='updateChart')
-            el-option(v-for="item in DB_Candidates",:key="item.value",:label="item.label",:value="item.value") 
+      el-col(:span="8")
+        el-form-item(label="DBs:" size="large")
+          el-select(v-model="appStore.states.dbs",placeholder="DB",style="width: 100%;",size='large',@change='updateChart',multiple)
+            el-option(v-for="item in dbs_Candidates",:key="item",:label="item",:value="item") 
             
       el-col(:span="14")  
         el-form-item(label="cat:" size="large")
@@ -15,15 +15,13 @@ el-container
       el-col(:span="4")  
         el-form-item(label="type:" size="large")
           el-select(v-model="appStore.states.Type",placeholder="type",style="width: 100%;",size='large',@change='updateChart')
-            el-option(v-for="item in Type_Candidates",:key="item",:label="item",:value="item") 
+            el-option(v-for="item in Type_Candidates",:key="item.value",:label="item.label",:value="item.value") 
 
-      el-col(:span="8")  
-        el-form-item(:label="`year range ${appStore.states.YearRange[0]}-${appStore.states.YearRange[1]}:`" size="large")
-          el-slider(v-model="appStore.states.YearRange" range show-input :min="1955" :max="2022" @change='updateChart')
+      el-col(:span="4")  
+        el-form-item(label="tj_type:" size="large")
+          el-select(v-model="appStore.states.tj_type",placeholder="type",style="width: 100%;",size='large',@change='updateChart')
+            el-option(v-for="item in tj_type_Candidates",:key="item.value",:label="item.label",:value="item.value") 
 
-      el-col(:span="8")  
-        el-form-item(:label="`node range ${appStore.states.NodeRange[0]}-${appStore.states.NodeRange[1]}:`" size="large")
-          el-slider(v-model="appStore.states.NodeRange" range show-input :min="1" :max="100000" @change='updateChart')
 
     el-row(v-loading="loading")
       el-col(:span="24")
@@ -32,12 +30,12 @@ el-container
   </template>
 
 <script lang="ts">
-const modelName = "openalex-power-law-tide";
+const modelName = "ArtCountBy102AndCats";
 export default {
   name: modelName,
-  autoIndex: false,
-  text: "openalex-power-law-tide",
-  update: "2023-04-11T09:43:03.429Z",
+  autoIndex: true,
+  text: "ArtCountBy102AndCats",
+  update: "2023-04-21T09:43:03.429Z",
 };
 </script>
 
@@ -51,21 +49,43 @@ import axios from "axios";
 import { nanoid } from "@/utils/tools";
 
 const chartID = nanoid();
-const DB_Candidates = [
+
+const dbs_Candidates = ["e102", "c102", "d102", "p102"];
+
+const tj_type_Candidates = [
   {
-    value: "openAlex_nobook_notypenull",
-    label: "openAlex去书，去论文类型为空",
+    value: 0,
+    label: "逐年数量",
+  },
+  {
+    value: 1,
+    label: "统计逐年交集",
   },
 ];
 
 const Cats_Candidates = [
-  "all_nobook_notypenull", //:表示openAlex去书，去论文类型为空
+  "all",
+  "Art",
+  "Business",
+  "Theoretical chemistry",
+  "Computational biology",
+  "Theoretical physics",
+  "Applied physics",
+  "Experimental physics",
+  "Number theory",
+  "Algebra",
+  "Geometry",
+  "Applied mathematics",
+  "Operating system",
+  "Discrete mathematics",
+  "Earth science",
   "Materials science",
   "Geology",
   "Geography",
   "Environmental science",
   "Medicine",
   "Psychology",
+  "Logic",
   "Philosophy",
   "Mathematics",
   "Physics",
@@ -78,7 +98,7 @@ const Cats_Candidates = [
   "History",
   "Computer science",
   "Artificial intelligence",
-  "Engineering",
+  "Engineering disciplines",
   "Chemical engineering",
   "Civil engineering",
   "Electrical engineering",
@@ -92,39 +112,43 @@ const Cats_Candidates = [
   "Blockchains",
   "Deep learning",
   "Theoretical computer science",
-  "Quantum computer",
+  "Quantum computing",
   "Genetic engineering",
   "Genome editing",
   "Anthropology",
   "Neuroscience",
   "Literature",
 ];
-const Type_Candidates = ["zipf", "innerzipf"];
+const Type_Candidates = [
+  {
+    value: 0,
+    label: "按所有网络计算",
+  },
+  {
+    value: 1,
+    label: "按1965-2010区间网络计算",
+  },
+];
 
 const loading = ref(false);
 // const appHomeStore = homeStore();
 // appHomeStore.title = "openalex power-law tide";
 const appStore = dynamicStore(modelName, {
-  DB: "openAlex_nobook_notypenull",
-  Cats: ["all_nobook_notypenull", "Materials science"],
-  Type: "zipf",
-  NodeRange: [100, 10000],
-  YearRange: [1955, 2022],
+  dbs: ["e102", "c102"],
+  Cats: ["all", "Materials science"],
+  Type: 1,
+  tj_type: 1,
 });
 let myChartObjs: echarts.ECharts[] = [];
 const updateChart = _.debounce(async () => {
   loading.value = true;
   let response = await axios.post(
-    "https://wiki.lmd.knogen.com:10443/api/mag/getZipfAndInnerzipfByYear_v3",
+    "https://wiki.lmd.knogen.com:10443/api/wiki/getArtCountBy102AndCats",
     {
-      db: appStore.states.DB,
       type: appStore.states.Type,
+      tj_type: appStore.states.tj_type,
       cats: appStore.states.Cats.join(","),
-      from: appStore.states.YearRange[0],
-      to: appStore.states.YearRange[1],
-      year: "",
-      from_node: appStore.states.NodeRange[0],
-      to_node: appStore.states.NodeRange[1],
+      dbs: appStore.states.dbs.join(","),
     }
   );
   console.log("response.data", response.data);
