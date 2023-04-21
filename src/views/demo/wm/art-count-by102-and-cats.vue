@@ -118,7 +118,7 @@ const Cats_Candidates = [
   "Anthropology",
   "Neuroscience",
   "Literature",
-];
+].sort();
 const Type_Candidates = [
   {
     value: 0,
