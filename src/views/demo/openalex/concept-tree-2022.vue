@@ -32,7 +32,7 @@ el-main
 export default {
   name: "concept-tree-2022",
   autoIndex: true,
-  text: "openalex concept Tree",
+  text: "OpenAlex concept Tree",
   update: "2022-10-13T01:01:01.429Z",
 };
 </script>
@@ -48,7 +48,7 @@ import type Node from "element-plus/es/components/tree/src/model/node";
 import { ElMessage } from "element-plus";
 
 const appHomeStore = homeStore();
-appHomeStore.title = "openalex tree browser";
+appHomeStore.title = "OpenAlex concept tree";
 
 interface Tree {
   id: string;
