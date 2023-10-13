@@ -5252,7 +5252,7 @@ const setOptions = (graph: {
         lineStyle: {
           curveness: 0.02,
         },
-        center: [100, 100],
+        center: [1000, 500],
         force: {
           initLayout: "circular",
           edgeLength: [5, 10],
