@@ -24,7 +24,7 @@ el-container
 
     el-row
       el-col(:span="4")
-        el-form-item(label="染色模式:" size="large")
+        el-form-item(label="着色模式:" size="large")
           el-switch(v-model="categoryMode"  size="large"  active-text="Subject" inactive-text="InfoMap" @change='updateChart')
       el-col(:span="4")
         el-form-item(label="展示标签:" size="large")
@@ -72,7 +72,7 @@ import { ElMessage } from "element-plus";
 import { scaleLinear } from "d3-scale";
 
 const appHomeStore = homeStore();
-appHomeStore.title = "subject algorithm tree";
+appHomeStore.title = "学科连接树";
 let dataset: any;
 const paperLoading = ref(false);
 const labelShow = ref(false);
@@ -5313,7 +5313,7 @@ onMounted(() => {
 });
 
 const dumpChart = () => {
-  let opt = myChartObj.getOption();
+  let opt: any = myChartObj.getOption();
   appStore.states.chartData.links = opt.series[0].links;
   appStore.states.chartData.data = opt.series[0].data;
   appStore.states.chartData.categories = opt.series[0].categories;
@@ -5324,7 +5324,7 @@ const dumpChart = () => {
 };
 
 const loadChart = () => {
-  let opt = myChartObj.getOption();
+  let opt: any = myChartObj.getOption();
   console.log(appStore.states.chartData);
   // opt.series[0].links = appStore.states.chartData.links;
   // opt.series[0].data = appStore.states.chartData.data;
