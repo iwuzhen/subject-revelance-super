@@ -5153,6 +5153,9 @@ const setOptions = (graph: {
   nodes: any;
   links: any;
 }) => {
+  // graph.nodes[0].x = 0;
+  // graph.nodes[0].y = 0;
+  // graph.nodes[0].fixed = true;
   let option = {
     title: {
       left: "center",
@@ -5252,7 +5255,7 @@ const setOptions = (graph: {
         lineStyle: {
           curveness: 0.02,
         },
-        center: [1000, 500],
+        center: ["50%", "50%"],
         force: {
           initLayout: "circular",
           edgeLength: [5, 10],
@@ -5319,8 +5322,8 @@ const dumpChart = () => {
   appStore.states.chartData.categories = opt.series[0].categories;
   appStore.states.chartData.center = opt.series[0].center;
   appStore.states.chartData.zoom = opt.series[0].zoom;
-  console.log(opt);
-  console.log(appStore.states.chartData);
+  console.log("dumpChart", opt);
+  console.log("dumpChart", appStore.states.chartData);
 };
 
 const loadChart = () => {
