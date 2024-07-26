@@ -169,6 +169,7 @@ const lv1_subject_data = {
     { name: "Sociology" },
   ],
 };
+
 const lv1_spanning_tree_links = [
   [0, 10, 0.3715],
   [0, 14, 0.3766],
