@@ -8,7 +8,7 @@ el-container
         el-button(type="success",v-else,@click="viewStatus=!viewStatus",style="margin-top: -40px;") 展示 Note
     el-row.md-editor(v-loading="loading")
       md-editor(v-model="text",v-if="viewStatus",:htmlPreview="false",:toolbarsExclude="toolbarsExclude",@change="onChange",@save="saveNoteBook",editorId="edit",:previewOnly="!father.editMode")
-      md-editor(v-model="text",v-else,:htmlPreview="false",editorId="view",:previewOnly="true")
+      md-preview(v-model="text",v-else,:htmlPreview="false",editorId="view",:previewOnly="true")
 </template>
 
 <script lang="ts">
@@ -19,7 +19,8 @@ export default {
 
 <script lang="ts" setup>
 import { ref, defineProps, onMounted, onUnmounted } from "vue";
-import MdEditor, { ToolbarNames } from "md-editor-v3";
+import { MdEditor, MdPreview, ToolbarNames } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
 import { ElMessage } from "element-plus";
 import { getNote, setNote } from "@/utils/requests";
 
@@ -95,6 +96,7 @@ const father = defineProps({
 button {
   position: absolute;
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.25s ease-out;
@@ -112,5 +114,6 @@ button {
 
 .md-editor {
   text-align: left;
+  height: auto;
 }
 </style>

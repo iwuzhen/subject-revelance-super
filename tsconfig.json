@@ -16,7 +16,6 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true,
-    "suppressImplicitAnyIndexErrors":true,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
